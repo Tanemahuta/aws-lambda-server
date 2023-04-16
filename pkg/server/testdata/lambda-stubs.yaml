@@ -1,0 +1,29 @@
+"arn:aws:lambda:eu-central-1:123456789012:function:my-function":
+  - request:
+      host: 127.0.0.1:65305
+      header:
+        Accept-Encoding:
+          - gzip
+        Content-Length:
+          - "4"
+        Content-Type:
+          - text/plain
+        User-Agent:
+          - Go-http-client/1.1
+      method: POST
+      uri: /test
+      vars: { }
+      body:
+        - 116
+        - 101
+        - 115
+        - 116
+    response:
+      statusCode: 202
+      headers:
+        test: test
+      body:
+        - 116
+        - 101
+        - 115
+        - 116

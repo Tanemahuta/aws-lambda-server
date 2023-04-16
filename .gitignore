@@ -1,0 +1,5 @@
+# Idea
+*.iml
+/cover.profile
+/test-report.json
+/test-report.xml
