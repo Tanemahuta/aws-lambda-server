@@ -29,7 +29,7 @@ var _ = Describe("SdkLambdaService", func() {
 		sut = nil
 		request = &aws.LambdaRequest{
 			Host:    "www.example.com",
-			Headers: map[string][]string{"test": {"test"}},
+			Headers: aws.Headers{Header: http.Header{"test": {"test"}}},
 			Method:  "POST",
 			URI:     "/test",
 			Vars:    map[string]string{"a": "b"},

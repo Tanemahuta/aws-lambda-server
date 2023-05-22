@@ -1,6 +1,8 @@
 package mux_test
 
 import (
+	"net/http"
+
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/mux"
 	. "github.com/onsi/ginkgo/v2"
@@ -15,6 +17,11 @@ var _ = Describe("New()", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 	It("should compile example router", func() {
-		Expect(mux.New(nil, cfg.Functions)).NotTo(BeNil())
+		decoratorInvoked := false
+		Expect(mux.New(nil, cfg.Functions, func(handler http.Handler, _ string) http.Handler {
+			decoratorInvoked = true
+			return handler
+		})).NotTo(BeNil())
+		Expect(decoratorInvoked).To(BeTrue())
 	})
 })

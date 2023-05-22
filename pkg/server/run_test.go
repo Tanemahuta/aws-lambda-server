@@ -54,7 +54,6 @@ var _ = Describe("Run()", func() {
 		}
 	})
 	It("should run correctly", func() {
-		defer GinkgoRecover()
 		Expect(server.Run(context.Background(), serverConfig)).NotTo(HaveOccurred())
 		response, err := http.Post(httpServer.URL+"/test", "text/plain", bytes.NewBufferString("test"))
 		Expect(err).NotTo(HaveOccurred())

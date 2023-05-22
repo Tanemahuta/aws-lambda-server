@@ -43,9 +43,9 @@ var _ = Describe("Lambda", func() {
 		requestVars = map[string]string{"a": "b"}
 		lambdaRequest = &aws.LambdaRequest{
 			Host: "www.example.com",
-			Headers: http.Header{
+			Headers: aws.Headers{Header: http.Header{
 				"Test": []string{"test"},
-			},
+			}},
 			Method: http.MethodPost,
 			URI:    "http://www.example.com/test",
 			Vars:   requestVars,
