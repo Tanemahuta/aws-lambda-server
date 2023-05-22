@@ -1,13 +1,11 @@
 package aws
 
-import "net/http"
-
 // LambdaRequest to be sent to the lambda.
 type LambdaRequest struct {
 	// Host in the request.
 	Host string `json:"host,omitempty" yaml:"host,omitempty"`
 	// Headers of the request.
-	Headers http.Header `json:"headers,omitempty" yaml:"header,omitempty"`
+	Headers Headers `json:"headers,omitempty" yaml:"header,omitempty"`
 	// Method from the request.
 	Method string `json:"method,omitempty" yaml:"method,omitempty"`
 	// URI from the request.
