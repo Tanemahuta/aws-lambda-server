@@ -43,9 +43,9 @@ var _ = Describe("Lambda", func() {
 		requestVars = map[string]string{"a": "b"}
 		lambdaRequest = &aws.LambdaRequest{
 			Host: "www.example.com",
-			Headers: aws.Headers{Header: http.Header{
+			Headers: aws.Headers{
 				"Test": []string{"test"},
-			}},
+			},
 			Method: http.MethodPost,
 			URI:    "http://www.example.com/test",
 			Vars:   requestVars,
@@ -74,7 +74,7 @@ var _ = Describe("Lambda", func() {
 	It("should invoke and write response", func() {
 		lambdaResponse = &aws.LambdaResponse{
 			StatusCode: http.StatusAccepted,
-			Headers:    map[string]string{"test": "test"},
+			Headers:    aws.Headers{"test": []string{"test"}},
 			Body:       aws.Body{Data: []byte("test")},
 		}
 		Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())

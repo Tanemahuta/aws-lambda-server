@@ -24,7 +24,7 @@ var _ = Describe("Headers", func() {
 	Context("UnmarshalJSON()", func() {
 		It("should unmarshal different types correctly", func() {
 			Expect(json.Unmarshal(headerJSONData, &sut)).NotTo(HaveOccurred())
-			Expect(sut.Header).To(And(
+			Expect(sut).To(And(
 				HaveKeyWithValue("Bool", ConsistOf("true")),
 				HaveKeyWithValue("Double", ConsistOf("0.0")),
 				HaveKeyWithValue("Int", ConsistOf("0")),
@@ -38,7 +38,7 @@ var _ = Describe("Headers", func() {
 	Context("UnmarshalYAML()", func() {
 		It("should unmarshal different types correctly", func() {
 			Expect(yaml.Unmarshal(headerYamlData, &sut)).NotTo(HaveOccurred())
-			Expect(sut.Header).To(And(
+			Expect(sut).To(And(
 				HaveKeyWithValue("Bool", ConsistOf("true")),
 				HaveKeyWithValue("Double", ConsistOf("0.0")),
 				HaveKeyWithValue("Int", ConsistOf("0")),

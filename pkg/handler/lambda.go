@@ -36,8 +36,10 @@ func (r *Lambda) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	// Otherwise apply the response to the writer.
-	for key, value := range response.Headers {
-		writer.Header().Set(key, value)
+	for key, values := range response.Headers {
+		for _, value := range values {
+			writer.Header().Add(key, value)
+		}
 	}
 	writer.WriteHeader(response.StatusCode)
 	if _, err = writer.Write(response.Body.Data); err != nil {
@@ -48,7 +50,7 @@ func (r *Lambda) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 func (r *Lambda) adaptRequest(request *http.Request) (*aws.LambdaRequest, error) {
 	result := aws.LambdaRequest{
 		Host:    request.Host,
-		Headers: aws.Headers{Header: request.Header},
+		Headers: aws.Headers(request.Header),
 		Method:  request.Method, URI: request.RequestURI,
 		Vars: mux.Vars(request),
 	}

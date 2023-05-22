@@ -29,7 +29,7 @@ var _ = Describe("SdkLambdaService", func() {
 		sut = nil
 		request = &aws.LambdaRequest{
 			Host:    "www.example.com",
-			Headers: aws.Headers{Header: http.Header{"test": {"test"}}},
+			Headers: aws.Headers{"test": {"test"}},
 			Method:  "POST",
 			URI:     "/test",
 			Vars:    map[string]string{"a": "b"},
@@ -40,7 +40,7 @@ var _ = Describe("SdkLambdaService", func() {
 		Expect(err).NotTo(HaveOccurred())
 		response = &aws.LambdaResponse{
 			StatusCode: http.StatusAccepted,
-			Headers:    map[string]string{"a": "b"},
+			Headers:    aws.Headers{"A": []string{"b"}},
 			Body:       aws.Body{Data: []byte("test")},
 		}
 		responsePayload, err = json.Marshal(response)
@@ -71,6 +71,27 @@ var _ = Describe("SdkLambdaService", func() {
 			return &lambda.InvokeOutput{Payload: responsePayload, LogResult: &logOutput}, nil
 		}
 		Expect(sut.Invoke(context.TODO(), testArn, request)).To(Equal(response))
+	})
+	It("should decode base64 payload", func() {
+		sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
+			*lambda.InvokeOutput, error,
+		) {
+			return &lambda.InvokeOutput{
+				Payload: []byte(
+					"eyJzdGF0dXNDb2RlIjoyMDAsImhlYWRlcnMiOnsiQ29udGVudC1UeXBlIjoidGV4dC9wbGFpbjsgdm" +
+						"Vyc2lvbj0wLjAuNCIsIkNvbnRlbnQtTGVuZ3RoIjo0fSwiYm9keSI6InRlc3QifQ==",
+				),
+				StatusCode: 200,
+			}, nil
+		}
+		Expect(sut.Invoke(context.TODO(), testArn, request)).To(Equal(&aws.LambdaResponse{
+			StatusCode: http.StatusOK,
+			Headers: aws.Headers{
+				"Content-Type":   []string{"text/plain; version=0.0.4"},
+				"Content-Length": []string{"4"},
+			},
+			Body: aws.Body{Data: []byte("test"), Formatted: false},
+		}))
 	})
 	It("should error if invocation errors", func() {
 		sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (

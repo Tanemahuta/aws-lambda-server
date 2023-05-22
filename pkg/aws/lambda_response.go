@@ -5,7 +5,7 @@ type LambdaResponse struct {
 	// StatusCode for the http response.
 	StatusCode int `json:"statusCode" yaml:"statusCode"`
 	// Headers to be appended.
-	Headers map[string]string `json:"headers" yaml:"headers"`
+	Headers Headers `json:"headers" yaml:"headers"`
 	// Body to be written.
 	Body Body `json:"body" yaml:"body"`
 }
