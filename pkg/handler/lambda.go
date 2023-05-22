@@ -48,7 +48,7 @@ func (r *Lambda) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 func (r *Lambda) adaptRequest(request *http.Request) (*aws.LambdaRequest, error) {
 	result := aws.LambdaRequest{
 		Host:    request.Host,
-		Headers: request.Header,
+		Headers: aws.Headers{Header: request.Header},
 		Method:  request.Method, URI: request.RequestURI,
 		Vars: mux.Vars(request),
 	}

@@ -2,14 +2,10 @@
   - request:
       host: 127.0.0.1:65305
       header:
-        Accept-Encoding:
-          - gzip
-        Content-Length:
-          - "4"
-        Content-Type:
-          - text/plain
-        User-Agent:
-          - Go-http-client/1.1
+        Accept-Encoding: gzip
+        Content-Length: 4
+        Content-Type: text/plain
+        User-Agent: Go-http-client/1.1
       method: POST
       uri: /test
       vars: { }
