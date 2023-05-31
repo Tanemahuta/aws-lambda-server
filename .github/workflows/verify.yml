@@ -178,11 +178,9 @@ jobs:
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
         timeout-minutes: 2
-        env:
-          HELM_SET_EXTRA_ARGS: "--set-string=deployment.image.tag=${{ steps.build-and-export.outputs.imageid }} --set-string=deployment.image.pullPolicy=Never"
         run: |
           ct install\
            --target-branch ${{ github.event.repository.default_branch }}\
-           --helm-extra-set-args "${HELM_SET_EXTRA_ARGS}"\
+           --helm-extra-set-args "--set-string=deployment.image.tag=${{ steps.meta.outputs.imageid }}"\
            --debug
           
