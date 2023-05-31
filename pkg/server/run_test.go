@@ -3,22 +3,18 @@ package server_test
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"reflect"
 	"strings"
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/metrics"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/server"
-	"github.com/aws/aws-sdk-go-v2/aws/arn"
+	"github.com/Tanemahuta/aws-lambda-server/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 )
 
 var _ = Describe("Run()", func() {
@@ -27,10 +23,7 @@ var _ = Describe("Run()", func() {
 		serverConfig                server.Config
 	)
 	BeforeEach(func() {
-		var lambdaStubs LambdaStubs
-		data, err := os.ReadFile("testdata/lambda-stubs.yaml")
-		Expect(err).NotTo(HaveOccurred())
-		Expect(yaml.Unmarshal(data, &lambdaStubs)).NotTo(HaveOccurred())
+		lambdaStubs := testing.DefaultLambdaStubs()
 		serverConfig = server.Config{
 			Filename:      "../config/testdata/config.yaml",
 			Listen:        ":8080",
@@ -132,22 +125,3 @@ var _ = Describe("Run()", func() {
 		Expect(server.Run(context.Background(), serverConfig)).To(MatchError(ContainSubstring("meh")))
 	})
 })
-
-type LambdaStub struct {
-	Request  aws.LambdaRequest  `json:"requests"`
-	Response aws.LambdaResponse `json:"response"`
-}
-
-type LambdaStubs map[string][]LambdaStub
-
-func (l LambdaStubs) Invoke(_ context.Context, arn arn.ARN, request *aws.LambdaRequest) (*aws.LambdaResponse, error) {
-	for _, stub := range l[arn.String()] {
-		if reflect.DeepEqual(&stub.Request, request) {
-			return &stub.Response, nil
-		}
-	}
-	defer GinkgoRecover()
-	data, _ := yaml.Marshal(request)
-	Fail(fmt.Sprintf("request for '%v' not found:\n%v", arn, string(data)))
-	return nil, errors.Errorf("could not find request stub for lambda '%v': %v", arn, request)
-}

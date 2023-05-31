@@ -19,6 +19,17 @@ type SdkLambdaService func(ctx context.Context, params *lambda.InvokeInput, optF
 	*lambda.InvokeOutput, error,
 )
 
+func (s SdkLambdaService) CanInvoke(ctx context.Context, arn arn.ARN) error {
+	log := logr.FromContextOrDiscard(ctx)
+	log.Info("checking if lambda can be invoked", "arn", arn)
+	functionName := arn.String()
+	_, err := s(ctx, &lambda.InvokeInput{
+		FunctionName:   &functionName,
+		InvocationType: types.InvocationTypeDryRun,
+	})
+	return err
+}
+
 func (s SdkLambdaService) Invoke(ctx context.Context, arn arn.ARN, request *LambdaRequest) (*LambdaResponse, error) {
 	var (
 		payload  []byte

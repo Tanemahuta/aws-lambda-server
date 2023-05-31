@@ -52,71 +52,93 @@ var _ = Describe("SdkLambdaService", func() {
 			AccountID: "123456789012",
 			Resource:  "function:my-function",
 		}
-		testArnStr := testArn.String()
-		expectedInv = &lambda.InvokeInput{
-			FunctionName:   &testArnStr,
-			InvocationType: types.InvocationTypeRequestResponse,
-			LogType:        types.LogTypeTail,
-			Payload:        requestPayload,
-		}
 	})
-	It("should convert response", func() {
-		sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
-			*lambda.InvokeOutput, error,
-		) {
-			Expect(params).To(Equal(expectedInv))
-			logBytes := make([]byte, base64.StdEncoding.EncodedLen(4))
-			base64.StdEncoding.Encode(logBytes, []byte("test"))
-			logOutput := string(logBytes)
-			return &lambda.InvokeOutput{Payload: responsePayload, LogResult: &logOutput}, nil
-		}
-		Expect(sut.Invoke(context.TODO(), testArn, request)).To(Equal(response))
+	Context("CanInvoke()", func() {
+		BeforeEach(func() {
+			testArnStr := testArn.String()
+			expectedInv = &lambda.InvokeInput{
+				FunctionName:   &testArnStr,
+				InvocationType: types.InvocationTypeDryRun,
+			}
+		})
+		It("should pass error through", func() {
+			sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
+				*lambda.InvokeOutput, error,
+			) {
+				Expect(params).To(Equal(expectedInv))
+				return nil, errors.New("meh")
+			}
+			Expect(sut.CanInvoke(context.TODO(), testArn)).To(MatchError("meh"))
+		})
 	})
-	It("should decode base64 payload", func() {
-		sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
-			*lambda.InvokeOutput, error,
-		) {
-			return &lambda.InvokeOutput{
-				Payload: []byte(
-					"eyJzdGF0dXNDb2RlIjoyMDAsImhlYWRlcnMiOnsiQ29udGVudC1UeXBlIjoidGV4dC9wbGFpbjsgdm" +
-						"Vyc2lvbj0wLjAuNCIsIkNvbnRlbnQtTGVuZ3RoIjo0fSwiYm9keSI6InRlc3QifQ==",
-				),
-				StatusCode: 200,
-			}, nil
-		}
-		Expect(sut.Invoke(context.TODO(), testArn, request)).To(Equal(&aws.LambdaResponse{
-			StatusCode: http.StatusOK,
-			Headers: aws.Headers{
-				"Content-Type":   []string{"text/plain; version=0.0.4"},
-				"Content-Length": []string{"4"},
-			},
-			Body: aws.Body{Data: []byte("test"), Formatted: false},
-		}))
-	})
-	It("should error if invocation errors", func() {
-		sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
-			*lambda.InvokeOutput, error,
-		) {
-			return nil, errors.New("meh")
-		}
-		_, err := sut.Invoke(context.TODO(), testArn, request)
-		Expect(err).To(MatchError(And(
-			ContainSubstring("could not invoke lambda"),
-			ContainSubstring("my-function"),
-			ContainSubstring("meh"),
-		)))
-	})
-	It("should error if payload cannot be unmarshalled", func() {
-		sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
-			*lambda.InvokeOutput, error,
-		) {
-			return &lambda.InvokeOutput{Payload: []byte("6")}, nil
-		}
-		_, err := sut.Invoke(context.TODO(), testArn, request)
-		Expect(err).To(MatchError(And(
-			ContainSubstring("could not unmarshal payload to response"),
-			ContainSubstring("cannot unmarshal number into Go value of type aws.LambdaResponse"),
-		)))
+	Context("Invoke()", func() {
+		BeforeEach(func() {
+			testArnStr := testArn.String()
+			expectedInv = &lambda.InvokeInput{
+				FunctionName:   &testArnStr,
+				InvocationType: types.InvocationTypeRequestResponse,
+				LogType:        types.LogTypeTail,
+				Payload:        requestPayload,
+			}
+		})
+		It("should convert response", func() {
+			sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
+				*lambda.InvokeOutput, error,
+			) {
+				Expect(params).To(Equal(expectedInv))
+				logBytes := make([]byte, base64.StdEncoding.EncodedLen(4))
+				base64.StdEncoding.Encode(logBytes, []byte("test"))
+				logOutput := string(logBytes)
+				return &lambda.InvokeOutput{Payload: responsePayload, LogResult: &logOutput}, nil
+			}
+			Expect(sut.Invoke(context.TODO(), testArn, request)).To(Equal(response))
+		})
+		It("should decode base64 payload", func() {
+			sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
+				*lambda.InvokeOutput, error,
+			) {
+				return &lambda.InvokeOutput{
+					Payload: []byte(
+						"eyJzdGF0dXNDb2RlIjoyMDAsImhlYWRlcnMiOnsiQ29udGVudC1UeXBlIjoidGV4dC9wbGFpbjsgdm" +
+							"Vyc2lvbj0wLjAuNCIsIkNvbnRlbnQtTGVuZ3RoIjo0fSwiYm9keSI6InRlc3QifQ==",
+					),
+					StatusCode: 200,
+				}, nil
+			}
+			Expect(sut.Invoke(context.TODO(), testArn, request)).To(Equal(&aws.LambdaResponse{
+				StatusCode: http.StatusOK,
+				Headers: aws.Headers{
+					"Content-Type":   []string{"text/plain; version=0.0.4"},
+					"Content-Length": []string{"4"},
+				},
+				Body: aws.Body{Data: []byte("test"), Formatted: false},
+			}))
+		})
+		It("should error if invocation errors", func() {
+			sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
+				*lambda.InvokeOutput, error,
+			) {
+				return nil, errors.New("meh")
+			}
+			_, err := sut.Invoke(context.TODO(), testArn, request)
+			Expect(err).To(MatchError(And(
+				ContainSubstring("could not invoke lambda"),
+				ContainSubstring("my-function"),
+				ContainSubstring("meh"),
+			)))
+		})
+		It("should error if payload cannot be unmarshalled", func() {
+			sut = func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
+				*lambda.InvokeOutput, error,
+			) {
+				return &lambda.InvokeOutput{Payload: []byte("6")}, nil
+			}
+			_, err := sut.Invoke(context.TODO(), testArn, request)
+			Expect(err).To(MatchError(And(
+				ContainSubstring("could not unmarshal payload to response"),
+				ContainSubstring("cannot unmarshal number into Go value of type aws.LambdaResponse"),
+			)))
+		})
 	})
 })
 

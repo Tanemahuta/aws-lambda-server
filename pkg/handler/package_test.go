@@ -20,6 +20,10 @@ var _ aws.LambdaService = LambdaServiceFn(nil)
 
 type LambdaServiceFn func(ctx context.Context, arn arn.ARN, request *aws.LambdaRequest) (*aws.LambdaResponse, error)
 
+func (l LambdaServiceFn) CanInvoke(context.Context, arn.ARN) error {
+	return nil
+}
+
 func (l LambdaServiceFn) Invoke(ctx context.Context, arn arn.ARN, request *aws.LambdaRequest) (
 	*aws.LambdaResponse, error,
 ) {
