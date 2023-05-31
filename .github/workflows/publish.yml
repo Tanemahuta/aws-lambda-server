@@ -1,12 +1,11 @@
 name: "publish"
 on:
-  push:
-    branches: ["main"]
-    tags: ["v*.*.*"]
   workflow_run:
     workflows: ["verify"]
     types:
       - completed
+    branches: ["main"]
+    tags: ["v*.*.*"]
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: tanemahuta/aws-lambda-server
