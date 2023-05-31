@@ -130,8 +130,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          load: true
-          push: true
+          push: false
           build-args: VERSION=${{ github.ref_name }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
