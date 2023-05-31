@@ -113,4 +113,4 @@ Additionally, the following [metrics are available](pkg/metrics/global.go):
 
 ## helm-chart
 
-Helm charts are created from the [charts directory](charts) and published to [this repository](https://tanemahuta.github.io/helm-charts).
+Helm charts are created from the [charts directory](charts) and published to [this repository](https://tanemahuta.github.io/aws-lambda-server/index.yaml).
