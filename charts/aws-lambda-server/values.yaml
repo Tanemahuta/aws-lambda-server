@@ -13,6 +13,7 @@ deployment:
     repository: ghcr.io/tanemahuta/aws-lambda-server
     # Defaults to the appVersion
     tag: ""
+    digest: ~
     pullPolicy: IfNotPresent
     pullSecrets: []
   # Amount of replicas

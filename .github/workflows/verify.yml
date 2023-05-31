@@ -162,4 +162,4 @@ jobs:
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
         timeout-minutes: 2
-        run: ct install --target-branch ${{ github.event.repository.default_branch }} --helm-extra-set-args "--set-string=deployment.image.tag=${{ steps.build-and-export.outputs.digest }}"
+        run: ct install --target-branch ${{ github.event.repository.default_branch }} --helm-extra-set-args "--set-string=deployment.image.digest=${{ steps.build-and-export.outputs.digest }} --set-string=deployment.image.pullPolicy=Never"

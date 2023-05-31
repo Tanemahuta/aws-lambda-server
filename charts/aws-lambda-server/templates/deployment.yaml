@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: aws-lambda-server
-          image: {{ include "aws-lambda-server.image" . }}
+          image: "{{ include "aws-lambda-server.image" . }}"
           imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
           ports:
             - containerPort: 8080

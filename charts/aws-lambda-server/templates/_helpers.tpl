@@ -34,5 +34,9 @@ aws-lambda-server: {{ include "aws-lambda-server.fullname" . }}
 Image for the deployment
 */}}
 {{- define "aws-lambda-server.image" -}}
-{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag | default .Chart.AppVersion }}
+{{- if .Values.deployment.image.digest -}}
+{{- .Values.deployment.image.repository -}}@{{- .Values.deployment.image.digest -}}
+{{- else -}}
+{{- .Values.deployment.image.repository -}}:{{- .Values.deployment.image.tag | default .Chart.AppVersion -}}
+{{- end -}}
 {{- end }}
