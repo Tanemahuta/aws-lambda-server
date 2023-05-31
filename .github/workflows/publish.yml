@@ -1,9 +1,9 @@
 name: "publish"
 on:
   push:
-    tags: [ "v*.*.*" ]
+    tags: ["v*.*.*"]
   workflow_run:
-    workflows: [ "verify" ]
+    workflows: ["verify"]
     types:
       - completed
 env:
@@ -89,6 +89,7 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
   helm:
+    needs: ["docker"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -101,5 +102,7 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0
+        with:
+          charts_dir: charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
