@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+name: aws-lambda-server
+description: aws-lambda-server invokes aws lambda functions from HTTP requests
+keywords:
+  - AWS
+  - Amazon Web Services
+  - Lambda
+  - Function
+  - HTTP
+sources:
+  - https://github.com/Tanemahuta/aws-lambda-server/charts/aws-lambda-server
+version: 1.0.0
+appVersion: 1.1.0
+home: https://github.com/Tanemahuta/aws-lambda-server
+maintainers:
+  - name: Tanemahuta
+    email: christian.heike@icloud.com

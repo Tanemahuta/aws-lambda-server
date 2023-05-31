@@ -1,0 +1,13 @@
+{{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1/PodMonitor" }}
+---
+# Pod monitor for prometheus, if available
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+spec:
+  podMetricsEndpoints:
+    - path: "/metrics"
+      port: metrics
+  selector:
+    matchLabels:
+      {{- include "aws-lambda-server.selectorLabels" . | nindent 6 }}
+{{- end}}
