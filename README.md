@@ -111,3 +111,6 @@ Additionally, the following [metrics are available](pkg/metrics/global.go):
 - `aws_lambda_invocation_errors_total`: gauge for AWS lambda invocation errors by function ARN
 - `aws_lambda_invocation_duration_seconds`: histogram AWS lambda invocation duration by function ARN
 
+## helm-chart
+
+Helm charts are created from the [charts directory](charts) and published to [this repository](https://tanemahuta.github.io/helm-charts).
