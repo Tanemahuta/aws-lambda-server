@@ -18,8 +18,10 @@ type Decorator func(decorated http.Handler, functionArn string) http.Handler
 func New(invoker aws.LambdaService, funcs []config.Function, decorators ...Decorator) (http.Handler, error) {
 	result := mux.NewRouter()
 	for fIdx, functionRoute := range funcs {
-		if err := invoker.CanInvoke(context.TODO(), functionRoute.ARN.ARN.ARN); err != nil {
-			return nil, err
+		if functionRoute.ARN.AccountID != "000000000000" { // This is a test account
+			if err := invoker.CanInvoke(context.TODO(), functionRoute.ARN.ARN.ARN); err != nil {
+				return nil, err
+			}
 		}
 		var routeHandler http.Handler = &handler.Lambda{Invoker: invoker, ARN: functionRoute.ARN.ARN.ARN}
 		for _, decorator := range decorators {
