@@ -1,3 +1,4 @@
+---
 # Name and full name override for the release
 nameOverride: ""
 fullnameOverride: ""
@@ -5,14 +6,15 @@ fullnameOverride: ""
 # Deployment configuration
 deployment:
   metadata:
-    annotations: { }
-    labels: { }
+    annotations: {}
+    labels: {}
   # Image parameters
   image:
     repository: ghcr.io/tanemahuta/aws-lambda-server
-    tag: "" # Defaults to the appVersion
+    # Defaults to the appVersion
+    tag: ""
     pullPolicy: IfNotPresent
-    pullSecrets: [ ]
+    pullSecrets: []
   # Amount of replicas
   replicas: 1
   # Resources configuration
@@ -28,30 +30,32 @@ deployment:
     maxSurge: 1
     maxUnavailable: 1
   # Node selectors to be used
-  nodeSelector: { }
+  nodeSelector: {}
   # Toleration configuration
-  tolerations: [ ]
+  tolerations: []
   # Affinity configuration
-  affinity: { }
+  affinity: {}
   # Additional sidecar containers
-  sideCars: [ ]
+  sideCars: []
 # Service account configuration
 serviceAccount:
   metadata:
-    annotations: { }
-    # Example for assuming an IAM role (see https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
+    annotations: {}
+    # Example for assuming an IAM role
+    # (see https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
     # eks.amazonaws.com/role-arn: "arn:aws:iam::000000000000:role/my-lambda-invoker"
-    labels: { }
+    labels: {}
 
 service:
   metadata:
-    annotations: { }
-    labels: { }
+    annotations: {}
+    labels: {}
   ipFamilies:
     - IPv4
   externalTrafficPolicy: Cluster
-  loadBalancerClass: ~ # Set this, in case you need it
-  sessionAffinity: ~ # Set this, in case you need it
+  # Set these, in case you need it
+  loadBalancerClass: ~
+  sessionAffinity: ~
   type: ClusterIP
 
 # Configuration example
@@ -60,4 +64,4 @@ config:
     - arn: "arn:aws:lambda:eu-central-1:000000000000:function:my-lambda-function"
       routes:
         - path: "/"
-          methods: [ "GET" ]
+          methods: ["GET"]

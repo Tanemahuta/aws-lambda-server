@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 name: aws-lambda-server
 description: aws-lambda-server invokes aws lambda functions from HTTP requests
