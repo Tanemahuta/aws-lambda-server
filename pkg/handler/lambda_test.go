@@ -92,9 +92,15 @@ var _ = Describe("Lambda", func() {
 			Expect(httpResponse.Body.String()).To(Equal(lambdaResponse.Body.String()))
 		})
 		It("should add metrics", func() {
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).NotTo(BeNil())
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(BeNil())
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).NotTo(BeNil())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(HaveKeyWithValue(
+				"functionArn=arn:aws:lambda:eu-central-1:0123456789012:function:my-function",
+				BeNumerically("==", 1),
+			))
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(BeEmpty())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(HaveKeyWithValue(
+				"functionArn=arn:aws:lambda:eu-central-1:0123456789012:function:my-function",
+				BeNumerically("==", 1),
+			))
 		})
 	})
 	When("body cannot be read", func() {
@@ -106,9 +112,9 @@ var _ = Describe("Lambda", func() {
 			Expect(httpResponse.Code).To(Equal(http.StatusBadRequest))
 		})
 		It("should not add metrics", func() {
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(BeNil())
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(BeNil())
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(BeNil())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(BeEmpty())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(BeEmpty())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(BeEmpty())
 		})
 	})
 	When("lambda errors", func() {

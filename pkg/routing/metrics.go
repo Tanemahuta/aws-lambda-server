@@ -11,14 +11,13 @@ import (
 // MeterFactory for generic creation of MetricsDecorators handlers.
 type MeterFactory[O any, H http.Handler] func(O, http.Handler, ...promhttp.Option) H
 
-var (
-	MetricsDecorators = []Decorator{
-		CurryMeteringFactory[*prometheus.CounterVec](promhttp.InstrumentHandlerCounter, metrics.HttpRequestsTotal),
-		CurryMeteringFactory[prometheus.ObserverVec](promhttp.InstrumentHandlerDuration, metrics.HttpRequestsDuration),
-		CurryMeteringFactory[prometheus.ObserverVec](promhttp.InstrumentHandlerRequestSize, metrics.HttpRequestsSize),
-		CurryMeteringFactory[prometheus.ObserverVec](promhttp.InstrumentHandlerResponseSize, metrics.HttpResponsesSize),
-	}
-)
+//nolint:gochecknoglobals // global decorators.
+var MetricsDecorators = []Decorator{
+	CurryMeteringFactory[*prometheus.CounterVec](promhttp.InstrumentHandlerCounter, metrics.HTTPRequestsTotal),
+	CurryMeteringFactory[prometheus.ObserverVec](promhttp.InstrumentHandlerDuration, metrics.HTTPRequestsDuration),
+	CurryMeteringFactory[prometheus.ObserverVec](promhttp.InstrumentHandlerRequestSize, metrics.HTTPRequestsSize),
+	CurryMeteringFactory[prometheus.ObserverVec](promhttp.InstrumentHandlerResponseSize, metrics.HTTPResponsesSize),
+}
 
 // MeteringTarget allowing to curry labels.
 type MeteringTarget[O any] interface {

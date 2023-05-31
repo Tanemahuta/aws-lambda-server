@@ -62,10 +62,10 @@ var _ = Describe("Run()", func() {
 		if metricsServer != nil {
 			lambdaServer.Close()
 		}
-		metrics.HttpRequestsTotal.Reset()
-		metrics.HttpRequestsDuration.Reset()
-		metrics.HttpRequestsSize.Reset()
-		metrics.HttpResponsesSize.Reset()
+		metrics.HTTPRequestsTotal.Reset()
+		metrics.HTTPRequestsDuration.Reset()
+		metrics.HTTPRequestsSize.Reset()
+		metrics.HTTPResponsesSize.Reset()
 	})
 	When("running the server", func() {
 		var (
@@ -86,10 +86,22 @@ var _ = Describe("Run()", func() {
 				Expect(io.ReadAll(response.Body)).To(BeEquivalentTo([]byte("test")))
 			})
 			It("should add metrics", func() {
-				Expect(metrics.Collect(metrics.HttpRequestsTotal)).NotTo(BeEmpty())
-				Expect(metrics.Collect(metrics.HttpRequestsDuration)).NotTo(BeEmpty())
-				Expect(metrics.Collect(metrics.HttpRequestsSize)).NotTo(BeEmpty())
-				Expect(metrics.Collect(metrics.HttpResponsesSize)).NotTo(BeEmpty())
+				Expect(metrics.Collect(metrics.HTTPRequestsTotal)).To(HaveKeyWithValue(
+					"code=202,functionArn=arn:aws:lambda:eu-central-1:123456789012:function:my-function,method=post",
+					BeNumerically("==", 1),
+				))
+				Expect(metrics.Collect(metrics.HTTPRequestsDuration)).To(HaveKeyWithValue(
+					"code=202,functionArn=arn:aws:lambda:eu-central-1:123456789012:function:my-function,method=post",
+					BeNumerically("==", 1),
+				))
+				Expect(metrics.Collect(metrics.HTTPRequestsSize)).To(HaveKeyWithValue(
+					"code=202,functionArn=arn:aws:lambda:eu-central-1:123456789012:function:my-function,method=post",
+					BeNumerically("==", 1),
+				))
+				Expect(metrics.Collect(metrics.HTTPResponsesSize)).To(HaveKeyWithValue(
+					"code=202,functionArn=arn:aws:lambda:eu-central-1:123456789012:function:my-function,method=post",
+					BeNumerically("==", 1),
+				))
 			})
 		})
 		It("should serve metrics", func() {

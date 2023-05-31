@@ -108,6 +108,6 @@ Additionally, the following [metrics are available](pkg/metrics/global.go):
 - `http_request_size_bytes`: histogram for http request size
 - `http_response_size_bytes`: histogram for http response size
 - `aws_lambda_invocation_total`: counter for AWS lambda invocations by function ARN
-- `aws_lambda_invocation_errors`: gauge for AWS lambda invocation errors by function ARN
+- `aws_lambda_invocation_errors_total`: gauge for AWS lambda invocation errors by function ARN
 - `aws_lambda_invocation_duration_seconds`: histogram AWS lambda invocation duration by function ARN
 
