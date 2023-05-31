@@ -35,4 +35,13 @@ var _ = Describe("New()", func() {
 		Expect(handler).To(BeNil())
 		Expect(err).To(HaveOccurred())
 	})
+	It("should error in case compilation fails", func() {
+		handler, err := routing.New(stubs, []config.Function{
+			{ARN: cfg.Functions[0].ARN, Routes: []config.Route{
+				{Methods: []string{http.MethodGet}, Path: "/{"},
+			}},
+		})
+		Expect(handler).To(BeNil())
+		Expect(err).To(HaveOccurred())
+	})
 })
