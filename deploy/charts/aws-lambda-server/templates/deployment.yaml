@@ -1,0 +1,72 @@
+---
+# Deployment which creates the pod(s)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aws-lambda-server.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  {{- with $annotations := .Values.deployment.metadata.annotations }}
+  annotations:
+    {{- $annotations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- with $labels := .Values.deployment.metadata.labels }}
+  labels:
+    {{- $labels | toYaml | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      {{- include "aws-lambda-server.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.deployment.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.deployment.rollingUpdate.maxUnavailable }}
+  template:
+    metadata:
+      labels:
+        {{- include "aws-lambda-server.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: aws-lambda-server
+          image: {{ include "aws-lambda-server.image" . }}
+          imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              name: lambda
+              protocol: TCP
+            - containerPort: 8081
+              name: metrics
+              protocol: TCP
+          resources:
+            limits:
+              {{- .Values.deployment.resources.limits | toYaml | nindent 14}}
+            requests:
+              {{- .Values.deployment.resources.requests | toYaml | nindent 14}}
+          livenessProbe:
+            httpGet:
+              port: 8081
+              scheme: http
+              path: /healthz
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              port: 8081
+              scheme: http
+              path: /readyz
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          volumeMounts:
+            - mountPath: /etc/aws-lambda-http-server
+              name: config
+      {{- if not ( empty .Values.deployment.image.pullSecrets ) }}
+      imagePullSecrets:
+        {{- .Values.deployment.image.pullSecrets | toYaml | nindent 8}}
+      {{- end}}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "aws-lambda-server.fullname" . }}
+  revisionHistoryLimit: 3

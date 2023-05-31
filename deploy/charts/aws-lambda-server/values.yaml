@@ -1,0 +1,63 @@
+# Name and full name override for the release
+nameOverride: ""
+fullnameOverride: ""
+
+# Deployment configuration
+deployment:
+  metadata:
+    annotations: { }
+    labels: { }
+  # Image parameters
+  image:
+    repository: ghcr.io/tanemahuta/aws-lambda-server
+    tag: "" # Defaults to the appVersion
+    pullPolicy: IfNotPresent
+    pullSecrets: [ ]
+  # Amount of replicas
+  replicas: 1
+  # Resources configuration
+  resources:
+    requests:
+      cpu: 100m
+      memory: 16Mi
+    limits:
+      cpu: 400m
+      memory: 64Mi
+  # Rolling update configuration
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+  # Node selectors to be used
+  nodeSelector: { }
+  # Toleration configuration
+  tolerations: [ ]
+  # Affinity configuration
+  affinity: { }
+  # Additional sidecar containers
+  sideCars: [ ]
+# Service account configuration
+serviceAccount:
+  metadata:
+    annotations: { }
+    # Example for assuming an IAM role (see https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
+    # eks.amazonaws.com/role-arn: "arn:aws:iam::000000000000:role/my-lambda-invoker"
+    labels: { }
+
+service:
+  metadata:
+    annotations: { }
+    labels: { }
+  ipFamilies:
+    - IPv4
+  externalTrafficPolicy: Cluster
+  loadBalancerClass: ~ # Set this, in case you need it
+  sessionAffinity: ~ # Set this, in case you need it
+  type: ClusterIP
+
+# Configuration example
+config:
+  functions:
+    - arn: "arn:aws:lambda:eu-central-1:000000000000:function:my-lambda-function"
+      routes:
+        - path: "/"
+          methods: [ "GET" ]

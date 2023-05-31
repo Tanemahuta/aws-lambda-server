@@ -1,0 +1,10 @@
+---
+# Config map providing the config.yaml to be mounted
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aws-lambda-server.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  config.yaml: |
+    {{- .Values.config | toYaml | nindent 4 }}

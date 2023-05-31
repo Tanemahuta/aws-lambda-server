@@ -1,0 +1,33 @@
+---
+# Service exposing the lambda
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aws-lambda-server.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  {{- with $annotations := .Values.service.metadata.annotations }}
+  annotations:
+    {{- $annotations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- with $labels := .Values.service.metadata.labels }}
+  labels:
+    {{- $labels | toYaml | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  ipFamilies:
+    {{- .Values.service.ipFamilies | toYaml | nindent 4 }}
+  {{- with $loadBalancerClass := .Values.service.loadBalancerClass }}
+  loadBalancerClass: {{ $loadBalancerClass }}
+  {{- end }}
+  {{- with $sessionAffinity := .Values.service.sessionAffinity }}
+  sessionAffinity: {{ $sessionAffinity }}
+  {{- end }}
+  ports:
+    - port: 8080
+      protocol: TCP
+      name: lambda
+      targetPort: lambda
+  selector:
+    {{- include "aws-lambda-server.selectorLabels" . | nindent 4 }}
