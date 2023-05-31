@@ -74,25 +74,41 @@ jobs:
         with:
           fetch-depth: 0
       # Test golang
+      - name: determine golang changes
+        uses: dorny/paths-filter@v2
+        id: golang-changes
+        with:
+          filters: |
+            golang:
+              - '**/*.go'
+              - '**/testdata/**'
+              - 'go.mod'
+              - 'go.sum'
+        # run only if some file in 'src' folder was changed
       - name: setup go
+        if: steps.golang-changes.outputs.golang == 'true'
         uses: actions/setup-go@v4
         with:
           go-version: "1.20"
       - id: go-cache-paths
+        if: steps.golang-changes.outputs.golang == 'true'
         run: |
           echo "::set-output name=go-build::$(go env GOCACHE)"
           echo "::set-output name=go-mod::$(go env GOMODCACHE)"
       - name: Go Build Cache
+        if: steps.golang-changes.outputs.golang == 'true'
         uses: actions/cache@v3
         with:
           path: ${{ steps.go-cache-paths.outputs.go-build }}
           key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
       - name: Go Mod Cache
+        if: steps.golang-changes.outputs.golang == 'true'
         uses: actions/cache@v3
         with:
           path: ${{ steps.go-cache-paths.outputs.go-mod }}
           key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
       - name: ginkgo
+        if: steps.golang-changes.outputs.golang == 'true'
         run: |
           go run github.com/onsi/ginkgo/v2/ginkgo -r --randomize-all --randomize-suites \
           --fail-on-pending --keep-going --trace \
@@ -101,6 +117,7 @@ jobs:
           --race --junit-report=test-report.xml \
           ./... 
       - name: Codecov
+        if: steps.golang-changes.outputs.golang == 'true'
         uses: codecov/codecov-action@v3
         with:
           files: cover.profile
