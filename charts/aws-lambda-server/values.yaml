@@ -52,11 +52,11 @@ service:
     labels: {}
   ipFamilies:
     - IPv4
-  externalTrafficPolicy: Cluster
-  # Set these, in case you need it
+  type: ClusterIP
+  # Set these, in case you need it. Watch out for the type of the service.
+  externalTrafficPolicy: ~
   loadBalancerClass: ~
   sessionAffinity: ~
-  type: ClusterIP
 
 # Configuration example
 config:
