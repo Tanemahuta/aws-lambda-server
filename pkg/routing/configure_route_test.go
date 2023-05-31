@@ -1,8 +1,8 @@
-package mux_test
+package routing_test
 
 import (
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
-	"github.com/Tanemahuta/aws-lambda-server/pkg/mux"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/routing"
 	gorilla "github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -23,7 +23,7 @@ var _ = Describe("ConfigureRoute()", func() {
 	})
 	Context("RouteConfig", func() {
 		It("should skip zero values", func() {
-			configured, err := mux.ConfigureRoute(
+			configured, err := routing.ConfigureRoute(
 				route,
 				config.Route{
 					Path: "/test/{id}",
@@ -34,7 +34,7 @@ var _ = Describe("ConfigureRoute()", func() {
 			Expect(configured.GetPathTemplate()).To(Equal("/test/{id}"))
 		})
 		It("should use all values", func() {
-			configured, err := mux.ConfigureRoute(
+			configured, err := routing.ConfigureRoute(
 				route,
 				config.Route{
 					Name:          "test",
@@ -55,19 +55,19 @@ var _ = Describe("ConfigureRoute()", func() {
 	})
 	Context("errors", func() {
 		It("should error on invalid method", func() {
-			_, err := mux.ConfigureRoute(route, testConfig{ignored: "b", NoMethod: "a"}, (*gorilla.Route).GetError)
+			_, err := routing.ConfigureRoute(route, testConfig{ignored: "b", NoMethod: "a"}, (*gorilla.Route).GetError)
 			Expect(err).To(MatchError(ContainSubstring("could not find exported config function")))
 		})
 		It("should error on invalid method", func() {
-			_, err := mux.ConfigureRoute(route, testConfig{GetError: "a"}, (*gorilla.Route).GetError)
+			_, err := routing.ConfigureRoute(route, testConfig{GetError: "a"}, (*gorilla.Route).GetError)
 			Expect(err).To(MatchError(ContainSubstring("expected two in parameters, but got 1")))
 		})
 		It("should error on invalid method", func() {
-			_, err := mux.ConfigureRoute(route, testConfig{Methods: []int{1}}, (*gorilla.Route).GetError)
+			_, err := routing.ConfigureRoute(route, testConfig{Methods: []int{1}}, (*gorilla.Route).GetError)
 			Expect(err).To(MatchError(ContainSubstring("could not convert config value to function input")))
 		})
 		It("should error on invalid method", func() {
-			_, err := mux.ConfigureRoute(route, testConfig{Headers: map[string]int{"a": 1}}, (*gorilla.Route).GetError)
+			_, err := routing.ConfigureRoute(route, testConfig{Headers: map[string]int{"a": 1}}, (*gorilla.Route).GetError)
 			Expect(err).To(MatchError(ContainSubstring("could not convert map to slice")))
 		})
 	})

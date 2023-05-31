@@ -6,9 +6,12 @@ import (
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/errorx"
+	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
-	"github.com/Tanemahuta/aws-lambda-server/pkg/mux"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/routing"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 )
@@ -19,7 +22,7 @@ func Run(ctx context.Context, serverConfig Config) error {
 	var (
 		routerConfig  *config.Server
 		lambdaService aws.LambdaService
-		handler       http.Handler
+		requestRouter http.Handler
 		err           error
 	)
 	return errorx.Fns{
@@ -39,12 +42,24 @@ func Run(ctx context.Context, serverConfig Config) error {
 		},
 		func() error {
 			log.Info("creating server router")
-			handler, err = mux.New(lambdaService, routerConfig.Functions)
-			return errors.Wrapf(err, "could not create lambda service '%v'", serverConfig.Filename)
+			requestRouter, err = routing.New(lambdaService, routerConfig.Functions, routing.MetricsDecorators...)
+			return errors.Wrapf(err, "could not create server router '%v'", serverConfig.Filename)
 		},
 		func() error {
-			log.Info("handling requests")
-			return serverConfig.RunFunc(ctx, serverConfig.Listen, handler)
+			group, runCtx := errgroup.WithContext(ctx)
+			group.Go(func() error {
+				log.Info("handling requests")
+				return serverConfig.RunFunc(runCtx, serverConfig.Listen, requestRouter)
+			})
+			group.Go(func() error {
+				log.Info("handling metrics")
+				metricsRouter := mux.NewRouter()
+				metricsRouter.NewRoute().Methods(http.MethodGet).Path("/metrics").Handler(promhttp.Handler())
+				metricsRouter.NewRoute().Methods(http.MethodGet).Path("/healthz").HandlerFunc(ping)
+				metricsRouter.NewRoute().Methods(http.MethodGet).Path("/readyz").HandlerFunc(ping)
+				return serverConfig.RunFunc(runCtx, serverConfig.MetricsListen, metricsRouter)
+			})
+			return group.Wait()
 		},
 	}.Run()
 }

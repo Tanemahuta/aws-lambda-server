@@ -21,6 +21,7 @@ func main() {
 	serverConfig := server.Config{
 		Filename:             "/etc/aws-lambda-http-server/config.yaml",
 		Listen:               ":8080",
+		MetricsListen:        ":8081",
 		LambdaServiceFactory: aws.NewLambdaService,
 		RunFunc: func(ctx context.Context, addr string, handler http.Handler) error {
 			httpSrv := &http.Server{
@@ -34,11 +35,18 @@ func main() {
 			return httpSrv.ListenAndServe()
 		},
 	}
-	flag.BoolVar(&devel, "devel", devel, "activate development logging")
-	flag.StringVar(&serverConfig.Filename, "config-file",
-		serverConfig.Filename, "use config file (yaml or json)")
-	flag.StringVar(&serverConfig.Listen, "listen",
-		serverConfig.Listen, "listener address")
+	flag.BoolVar(
+		&devel, "devel", devel, "activate development logging",
+	)
+	flag.StringVar(
+		&serverConfig.Filename, "config-file", serverConfig.Filename, "use config file (yaml or json)",
+	)
+	flag.StringVar(
+		&serverConfig.Listen, "listen", serverConfig.Listen, "listener address for lambda requests",
+	)
+	flag.StringVar(
+		&serverConfig.MetricsListen, "metrics-listen", serverConfig.MetricsListen, "listener address for metrics requests",
+	)
 	flag.Parse()
 	zapLog, err := createLogger(devel)
 	if err != nil {

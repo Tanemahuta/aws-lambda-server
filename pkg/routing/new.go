@@ -1,4 +1,4 @@
-package mux
+package routing
 
 import (
 	"net/http"
@@ -10,7 +10,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Decorator func(http.Handler, string) http.Handler
+// Decorator for a http request.
+type Decorator func(decorated http.Handler, functionArn string) http.Handler
 
 // New creates a new http.Handler for the aws.LambdaService using the Server.
 func New(invoker aws.LambdaService, funcs []config.Function, decorators ...Decorator) (http.Handler, error) {
@@ -18,7 +19,7 @@ func New(invoker aws.LambdaService, funcs []config.Function, decorators ...Decor
 	for fIdx, functionRoute := range funcs {
 		var routeHandler http.Handler = &handler.Lambda{Invoker: invoker, ARN: functionRoute.ARN.ARN.ARN}
 		for _, decorator := range decorators {
-			routeHandler = decorator(routeHandler, "invoke "+functionRoute.ARN.ARN.String())
+			routeHandler = decorator(routeHandler, functionRoute.ARN.ARN.String())
 		}
 		for rIdx, routeCfg := range functionRoute.Routes {
 			route, err := ConfigureRoute(result.NewRoute(), routeCfg, (*mux.Route).GetError)

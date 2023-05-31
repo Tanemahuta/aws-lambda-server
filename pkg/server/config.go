@@ -11,8 +11,10 @@ import (
 type Config struct {
 	// Filename of the config file.
 	Filename string
-	// Listen address.
+	// Listen address for requests.
 	Listen string
+	// MetricsListen address for metrics/health checks.
+	MetricsListen string
 	// LambdaServiceFactory to be used.
 	LambdaServiceFactory func(context.Context) (aws.LambdaService, error)
 	// RunFunc which runs the server.

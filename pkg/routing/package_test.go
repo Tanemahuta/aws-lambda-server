@@ -1,4 +1,4 @@
-package mux_test
+package routing_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestMux(t *testing.T) {
+func TestRouting(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "mux Suite")
+	RunSpecs(t, "routing Suite")
 }

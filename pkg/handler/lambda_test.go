@@ -8,6 +8,7 @@ import (
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/handler"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/metrics"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo/v2"
@@ -71,25 +72,57 @@ var _ = Describe("Lambda", func() {
 			ARN: lambdaArn,
 		}
 	})
-	It("should invoke and write response", func() {
-		lambdaResponse = &aws.LambdaResponse{
-			StatusCode: http.StatusAccepted,
-			Headers:    aws.Headers{"test": []string{"test"}},
-			Body:       aws.Body{Data: []byte("test")},
-		}
-		Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
-		Expect(httpResponse.Code).To(Equal(lambdaResponse.StatusCode))
-		Expect(httpResponse.Header()).To(Equal(http.Header{"Test": []string{"test"}}))
-		Expect(httpResponse.Body.String()).To(Equal(lambdaResponse.Body.String()))
+	AfterEach(func() {
+		metrics.AwsLambdaInvocationTotal.Reset()
+		metrics.AwsLambdaInvocationErrors.Reset()
+		metrics.AwsLambdaInvocationDuration.Reset()
 	})
-	It("should convert read error to response code", func() {
-		httpRequest.Body = UnreadableBody{}
-		Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
-		Expect(httpResponse.Code).To(Equal(http.StatusBadRequest))
+	When("receiving a valid lambda response", func() {
+		BeforeEach(func() {
+			lambdaResponse = &aws.LambdaResponse{
+				StatusCode: http.StatusAccepted,
+				Headers:    aws.Headers{"test": []string{"test"}},
+				Body:       aws.Body{Data: []byte("test")},
+			}
+			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
+		})
+		It("should adapt to http correctly", func() {
+			Expect(httpResponse.Code).To(Equal(lambdaResponse.StatusCode))
+			Expect(httpResponse.Header()).To(Equal(http.Header{"Test": []string{"test"}}))
+			Expect(httpResponse.Body.String()).To(Equal(lambdaResponse.Body.String()))
+		})
+		It("should add metrics", func() {
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).NotTo(BeNil())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(BeNil())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).NotTo(BeNil())
+		})
 	})
-	It("should convert error to response code", func() {
-		errLambda = errors.New("meh")
-		Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
-		Expect(httpResponse.Code).To(Equal(http.StatusInternalServerError))
+	When("body cannot be read", func() {
+		BeforeEach(func() {
+			httpRequest.Body = UnreadableBody{}
+			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
+		})
+		It("should convert error to response code", func() {
+			Expect(httpResponse.Code).To(Equal(http.StatusBadRequest))
+		})
+		It("should not add metrics", func() {
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(BeNil())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(BeNil())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(BeNil())
+		})
+	})
+	When("lambda errors", func() {
+		BeforeEach(func() {
+			errLambda = errors.New("meh")
+			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
+		})
+		It("should convert error to response code", func() {
+			Expect(httpResponse.Code).To(Equal(http.StatusInternalServerError))
+		})
+		It("should add metrics", func() {
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).NotTo(BeNil())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).NotTo(BeNil())
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).NotTo(BeNil())
+		})
 	})
 })
