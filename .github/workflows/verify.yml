@@ -162,7 +162,7 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         timeout-minutes: 2
         run: |
-          kind load docker-image aws-lambda-server:${{ github.sha }}
+          kind load docker-image aws-lambda-server:${{ github.sha }} --context chart-testing
           ct install\
            --target-branch ${{ github.event.repository.default_branch }}\
            --helm-extra-set-args "
