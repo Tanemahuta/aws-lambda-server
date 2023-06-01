@@ -5,26 +5,48 @@ on:
     tags: ["v*.*.*"]
   pull_request:
     branches: ["main"]
-env:
-  CHANGE_FILTERS: |
-    golang:
-      - '**/*.go'
-      - '**/testdata/**'
-      - 'go.mod'
-      - 'go.sum'
-      - '.golangci.yaml'
-    helm:
-      - 'charts/**'
-      - '.yamllint'
-    docker:
-      - 'Dockerfile'
-      - '.dockerignore'
-      - '.hadolint.yaml'
-      - 'buildinfo/*.sh'
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      golang: ${{ steps.changes.outputs.golang == 'true' }}
+      docker: ${{ steps.changes.outputs.docker == 'true'}}
+      helm: ${{ steps.changes.outputs.helm == 'true' }}
+    steps:
+      # Checkout
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      # Determine changes
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            golang:
+              - '**/*.go'
+              - '**/testdata/**'
+              - 'go.mod'
+              - 'go.sum'
+              - '.golangci.yaml'
+            helm:
+              - 'charts/**'
+              - '.yamllint'
+            docker:
+              - 'Dockerfile'
+              - '.dockerignore'
+              - '.hadolint.yaml'
+              - 'buildinfo/*.sh'
   golang:
+    needs: changes
     uses: ./.github/workflows/verify-go.yaml
+    if: needs.changes.outputs.golang == 'true'
   docker:
     uses: ./.github/workflows/verify-docker.yaml
+    if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.helm == 'true' || needs.changes.outputs.docker == 'true'
   helm:
+    needs:
+      - changes
+      - docker
     uses: ./.github/workflows/verify-helm.yaml
+    if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.helm == 'true' || needs.changes.outputs.docker == 'true'
