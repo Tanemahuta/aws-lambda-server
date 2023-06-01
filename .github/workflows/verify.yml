@@ -9,6 +9,6 @@ jobs:
   golang:
     uses: ./.github/workflows/verify-go.yaml
   docker:
-    uses: ./github/workflows/verify-docker.yaml
+    uses: ./.github/workflows/verify-docker.yaml
   helm:
     uses: ./.github.com/workflows/verify-helm.yaml
