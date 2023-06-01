@@ -133,7 +133,7 @@ jobs:
           context: .
           load: true
           push: false
-          build-args: VERSION=${{ github.ref_name }}
+          build-args: VERSION=${{ github.ref_name }},COMMIT_SHA=${{ github.sha }}
           tags: aws-lambda-server:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -53,7 +53,11 @@ func main() {
 		panic(err)
 	}
 	log := zapr.NewLogger(zapLog)
-	log.Info("starting aws-lambda-http-server", "version", buildinfo.Version, "timestamp", buildinfo.Timestamp)
+	log.Info("starting aws-lambda-http-server",
+		"version", buildinfo.Version(),
+		"commitSHA", buildinfo.CommitSHA(),
+		"timestamp", buildinfo.Timestamp(),
+	)
 	ctx := logr.NewContext(context.Background(), log)
 	if err = server.Run(ctx, serverConfig); err != nil {
 		log.Error(err, "could not run server")
