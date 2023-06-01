@@ -12,8 +12,10 @@ jobs:
         with:
           fetch-depth: 0
       # Determine changes
-      - uses: ./.github/actions/changes
+      - uses: dorny/paths-filter@v2
         id: changes
+        with:
+          filters: ${{ env.CHANGE_FILTERS }}
       - uses: hadolint/hadolint-action@v3.1.0
         if: steps.changes.outputs.docker == 'true' || steps.changes.outputs.golang == 'true'
         with:
@@ -28,8 +30,10 @@ jobs:
         with:
           fetch-depth: 0
       # Determine changes
-      - uses: ./.github/actions/changes
+      - uses: dorny/paths-filter@v2
         id: changes
+        with:
+          filters: ${{ env.CHANGE_FILTERS }}
       - uses: ./.github/actions/docker-setup
         if: steps.changes.outputs.docker == 'true' || steps.changes.outputs.golang == 'true' || steps.changes.outputs.helm == 'true'
       - uses: ./.github/actions/docker-build

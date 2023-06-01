@@ -5,6 +5,22 @@ on:
     tags: ["v*.*.*"]
   pull_request:
     branches: ["main"]
+env:
+  CHANGE_FILTERS: |
+    golang:
+      - '**/*.go'
+      - '**/testdata/**'
+      - 'go.mod'
+      - 'go.sum'
+      - '.golangci.yaml'
+    helm:
+      - 'charts/**'
+      - '.yamllint'
+    docker:
+      - 'Dockerfile'
+      - '.dockerignore'
+      - '.hadolint.yaml'
+      - 'buildinfo/*.sh'
 jobs:
   golang:
     uses: ./.github/workflows/verify-go.yaml
