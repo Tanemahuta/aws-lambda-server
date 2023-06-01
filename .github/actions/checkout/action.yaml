@@ -1,0 +1,34 @@
+description: checkout and determine changes
+name: checkout
+outputs:
+  changes:
+    description: "changes to files in the repositories"
+    value: ${{ steps.changes.outputs }}
+runs:
+  using: "composite"
+  steps:
+    # Checkout
+    - name: checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    # Determine changes
+    - name: determine changes
+      uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          golang:
+            - '**/*.go'
+            - '**/testdata/**'
+            - 'go.mod'
+            - 'go.sum'
+            - '.golangci.yaml'
+          helm:
+            - 'charts/**'
+            - '.yamllint'
+          docker:
+            - 'Dockerfile'
+            - '.dockerignore'
+            - '.hadolint.yaml
+            - 'buildinfo/*.sh'

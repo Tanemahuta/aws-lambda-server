@@ -7,21 +7,8 @@ on:
     branches: ["main"]
 jobs:
   golang:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ./.github/workflows/checkout.yaml
-      - uses: ./.github/workflows/verify-go.yaml
-        if: steps.changes.outputs.golang == 'true'
+    uses: ./.github/workflows/verify-go.yaml
   docker:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ./.github/workflows/checkout.yaml
-      - uses: ./.github/workflows/verify-docker.yaml
-        if: steps.changes.outputs.docker == 'true' || steps.changes.outputs.golang == 'true'
+    uses: ./github/workflows/verify-docker.yaml
   helm:
-    runs-on: ubuntu-latest
-    needs: ["docker"]
-    steps:
-      - uses: ./.github.com/workflows/checkout.yaml
-      - uses: ./.github.com/workflows/verify-helm.yaml
-        if: steps.changes.outputs.helm == 'true' || steps.changes.outputs.docker == 'true' || steps.changes.outputs.golang == 'true'
+    uses: ./.github.com/workflows/verify-helm.yaml

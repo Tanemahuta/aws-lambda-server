@@ -5,21 +5,28 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/setup-go.yaml
+      - uses: ./.github/actions/checkout
+        id: checkout
+      - uses: ./.github/actions/go-setup
       # Run golangci-lint
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
+        if: steps.checkout.outputs.golang == 'true'
         with:
           only-new-issues: true
       # Update the go report
       - name: update-go-report
         uses: creekorful/goreportcard-action@v1.0
+        if: steps.checkout.outputs.golang == 'true'
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/setup-go.yaml
+      - uses: ./.github/actions/checkout
+        id: checkout
+      - uses: ./.github/actions/go-setup
       # Run ginkgo
       - name: ginkgo
+        if: steps.checkout.outputs.golang == 'true'
         run: |
           go run github.com/onsi/ginkgo/v2/ginkgo -r --randomize-all --randomize-suites \
           --fail-on-pending --keep-going --trace \
@@ -29,6 +36,7 @@ jobs:
           ./...
       # Push results to code coverages
       - name: Codecov
+        if: steps.checkout.outputs.golang == 'true'
         uses: codecov/codecov-action@v3
         with:
           files: cover.profile

@@ -6,15 +6,22 @@ jobs:
     runs-on: ubuntu-latest
     # Run hadolint
     steps:
+      - uses: ./.github/actions/checkout
+        id: checkout
       - uses: hadolint/hadolint-action@v3.1.0
+        if: steps.checkout.outputs.docker == 'true' || steps.checkout.outputs.golang == 'true'
         with:
           dockerfile: Dockerfile
   test:
     runs-on: ubuntu-latest
     # Build docker image
     steps:
-      - uses: ./.github/workflows/setup-docker.yaml
-      - uses: ./.github/workflows/build-docker.yaml
+      - uses: ./.github/actions/checkout
+        id: checkout
+      - uses: ./.github/actions/docker-setup
+        if: steps.checkout.outputs.docker == 'true' || steps.checkout.outputs.golang == 'true' || steps.checkout.outputs.helm == 'true'
+      - uses: ./.github/actions/docker-build
+        if: steps.checkout.outputs.docker == 'true' || steps.checkout.outputs.golang == 'true' || steps.checkout.outputs.helm == 'true'
         with:
           tags: aws-lambda-server:${{ github.sha }}
           push: false

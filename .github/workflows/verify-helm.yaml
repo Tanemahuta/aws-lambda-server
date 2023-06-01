@@ -5,18 +5,25 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/setup-helm.yaml
+      - uses: ./.github/actions/checkout
+        id: checkout
+      - uses: ./.github/actions/setup-helm
       - name: Run chart-testing (lint)
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
+        if: steps.checkout.outputs.helm == 'true'
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/setup-helm.yaml
+      - uses: ./.github/actions/checkout
+        id: checkout
+      - uses: ./.github/actions/helm-setup
       # Create a KiND cluster
       - name: Create kind cluster
+        if: steps.checkout.outputs.helm == 'true'
         uses: helm/kind-action@v1.4.0
       # Run the installation for the chart, loading the temporary docker image and using it for the deployment
       - name: Run chart-testing (install)
+        if: steps.checkout.outputs.docker == 'true' || steps.checkout.outputs.golang == 'true' || steps.checkout.outputs.helm == 'true'
         timeout-minutes: 2
         run: |
           kind load docker-image aws-lambda-server:${{ github.sha }} --name chart-testing
