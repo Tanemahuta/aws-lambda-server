@@ -25,5 +25,5 @@ runs:
           docker:
             - 'Dockerfile'
             - '.dockerignore'
-            - '.hadolint.yaml
-            - 'buildinfo/**'
+            - '.hadolint.yaml'
+            - 'buildinfo/*.sh'
