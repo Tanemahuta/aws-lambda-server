@@ -8,9 +8,17 @@ inputs:
     required: false
     default: "false"
     description: "true if to push the image"
+  load:
+    required: false
+    default: "true"
+    description: "true if to load the image"
   platforms:
     required: false
     description: "optional platforms to be used"
+outputs:
+  tags:
+    description: ""
+    value: ${{ steps.docker-build.outputs.tags }}
 runs:
   using: composite
   steps:
@@ -21,7 +29,7 @@ runs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        load: ${{ ! inputs.push }}
+        load: ${{ inputs.load }}
         push: ${{ inputs.push }}
         platforms: ${{ inputs.platforms }}
         build-args: |
