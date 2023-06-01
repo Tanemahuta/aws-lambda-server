@@ -17,9 +17,10 @@ COPY buildinfo/ buildinfo/
 COPY pkg/ pkg/
 
 ARG VERSION
+ARG COMMIT_SHA
 
 # Build
-RUN go generate ./... && \
+RUN VERSION=${VERSION} COMMIT_SHA=${COMMIT_SHA} go generate ./... && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a  -o aws-lambda-server main.go
 
 # Use distroless as minimal base image to package the manager binary
