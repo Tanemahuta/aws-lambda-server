@@ -44,10 +44,10 @@ jobs:
   docker:
     needs: changes
     uses: ./.github/workflows/verify-docker.yaml
-    if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.helm == 'true' || needs.changes.outputs.docker == 'true'
+    if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.docker == 'true'
   helm:
     needs:
       - changes
       - docker
     uses: ./.github/workflows/verify-helm.yaml
-    if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.helm == 'true' || needs.changes.outputs.docker == 'true'
+    if: needs.changes.outputs.helm == 'true'
