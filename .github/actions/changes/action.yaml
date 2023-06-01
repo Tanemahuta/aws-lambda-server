@@ -1,5 +1,5 @@
-description: checkout and determine changes
-name: checkout
+name: changes
+description: determine changes to repository
 outputs:
   changes:
     description: "changes to files in the repositories"
@@ -7,11 +7,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # Checkout
-    - name: checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
     # Determine changes
     - name: determine changes
       uses: dorny/paths-filter@v2
