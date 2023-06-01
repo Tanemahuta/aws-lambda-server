@@ -27,7 +27,7 @@ jobs:
         with:
           tags: aws-lambda-server:${{ github.sha }}
           push: false
-          load: false
+          load: true
       - uses: ./.github/actions/helm-setup
       # Create a KiND cluster
       - name: Create kind cluster
