@@ -42,6 +42,7 @@ jobs:
     uses: ./.github/workflows/verify-go.yaml
     if: needs.changes.outputs.golang == 'true'
   docker:
+    needs: changes
     uses: ./.github/workflows/verify-docker.yaml
     if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.helm == 'true' || needs.changes.outputs.docker == 'true'
   helm:
