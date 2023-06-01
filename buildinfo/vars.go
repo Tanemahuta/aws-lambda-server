@@ -10,6 +10,7 @@ import (
 //go:embed buildinfo.txt
 var buildInfoRaw string
 
+//nolint:gochecknoglobals // this is a static initialization.
 var buildInfo struct {
 	version, commitSHA, timestamp string
 }
@@ -29,6 +30,7 @@ func Timestamp() string {
 	return buildInfo.commitSHA
 }
 
+//nolint:gochecknoinits // this is a static initialization.
 func init() {
 	values := strings.Split(buildInfoRaw, "\n")
 	buildInfo.version = values[0]
