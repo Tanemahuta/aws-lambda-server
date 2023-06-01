@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: ./.github/actions/setup-helm
+      - uses: ./.github/actions/helm-setup
       - name: Run chart-testing (lint)
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
   test:
