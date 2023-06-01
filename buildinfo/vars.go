@@ -1,6 +1,5 @@
-package buildinfo
-
 //go:generate /bin/sh buildinfo.sh
+package buildinfo
 
 import (
 	_ "embed"
