@@ -11,7 +11,7 @@ keywords:
   - Server
 sources:
   - https://github.com/Tanemahuta/aws-lambda-server/charts/aws-lambda-server
-version: 1.0.0
+version: 1.0.1
 appVersion: 1.1.0
 home: https://github.com/Tanemahuta/aws-lambda-server
 maintainers:
