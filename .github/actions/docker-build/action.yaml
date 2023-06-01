@@ -16,9 +16,12 @@ inputs:
     required: false
     description: "optional platforms to be used"
 outputs:
-  tags:
-    description: ""
-    value: ${{ steps.docker-build.outputs.tags }}
+  digest:
+    description: "digest of the built image"
+    value: ${{ steps.docker-build.outputs.digest }}
+  imageid:
+    description: "id of the built image"
+    value: ${{ steps.docker-build.outputs.imageid }}
 runs:
   using: composite
   steps:
