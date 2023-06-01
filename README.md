@@ -1,4 +1,5 @@
 ![build](https://github.com/Tanemahuta/aws-lambda-server/actions/workflows/verify.yml/badge.svg?branch=main)
+[![go report](https://goreportcard.com/badge/github.com/Tanemahuta/aws-lambda-server)](https://goreportcard.com/report/github.com/Tanemahuta/aws-lambda-server)
 [![codecov](https://codecov.io/gh/Tanemahuta/aws-lambda-server/branch/main/graph/badge.svg?token=FHO3AAZ41O)](https://codecov.io/gh/Tanemahuta/aws-lambda-server)
 [![Go Reference](https://pkg.go.dev/badge/github.com/Tanemahuta/aws-lambda-server.svg)](https://pkg.go.dev/github.com/Tanemahuta/aws-lambda-server)
 ![GHCR](https://ghcr-badge.egpl.dev/tanemahuta/aws-lambda-server/tags?trim=major,minor&label=latest&ignore=sha256*,v*)
