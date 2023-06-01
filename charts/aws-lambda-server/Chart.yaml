@@ -8,6 +8,7 @@ keywords:
   - Lambda
   - Function
   - HTTP
+  - Server
 sources:
   - https://github.com/Tanemahuta/aws-lambda-server/charts/aws-lambda-server
 version: 1.0.0
