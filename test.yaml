@@ -1,5 +1,0 @@
-functions:
-  - arn: "arn:aws:lambda:eu-central-1:442848172398:function:svc-prx-62f981306e0fb1b5f7ba24d80c15a9e1620bdaf113c6eaa87a61027d"
-    routes:
-      - methods: [ "GET" ]
-        path: "/metrics"

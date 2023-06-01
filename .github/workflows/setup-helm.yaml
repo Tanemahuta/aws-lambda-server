@@ -1,0 +1,20 @@
+on:
+  workflow_call:
+    inputs: {}
+jobs:
+  setup-helm:
+    runs-on: ubuntu-latest
+    steps:
+      # Setup helm itself
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.11.2
+      # Setup python (for helm chart testing)
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          check-latest: true
+      # Setup helm chart-testing itself
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.4.0

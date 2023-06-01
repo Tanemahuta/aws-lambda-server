@@ -1,0 +1,20 @@
+on:
+  workflow_call:
+    inputs: {}
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    # Run hadolint
+    steps:
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+  test:
+    runs-on: ubuntu-latest
+    # Build docker image
+    steps:
+      - uses: ./.github/workflows/setup-docker.yaml
+      - uses: ./.github/workflows/build-docker.yaml
+        with:
+          tags: aws-lambda-server:${{ github.sha }}
+          push: false

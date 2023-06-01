@@ -1,0 +1,32 @@
+on:
+  workflow_call:
+    inputs: {}
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      # Determine changes
+      - name: determine changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            golang:
+              - '**/*.go'
+              - '**/testdata/**'
+              - 'go.mod'
+              - 'go.sum'
+              - '.golangci.yaml'
+            helm:
+              - 'charts/**'
+              - '.yamllint'
+            docker:
+              - 'Dockerfile'
+              - '.dockerignore'
+              - '.hadolint.yaml
+              - 'buildinfo/*.sh'
