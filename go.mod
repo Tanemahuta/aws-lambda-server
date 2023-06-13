@@ -11,7 +11,7 @@ require (
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/gorilla/mux v1.8.0
 	github.com/onsi/ginkgo/v2 v2.10.0
-	github.com/onsi/gomega v1.27.7
+	github.com/onsi/gomega v1.27.8
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.15.1
 	github.com/prometheus/client_model v0.4.0
