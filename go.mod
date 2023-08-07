@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.38.1
 	github.com/go-logr/logr v1.2.4
 	github.com/go-logr/zapr v1.2.4
-	github.com/go-playground/validator/v10 v10.14.1
+	github.com/go-playground/validator/v10 v10.15.0
 	github.com/gorilla/mux v1.8.0
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.10
