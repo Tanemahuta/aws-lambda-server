@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/aws/aws-sdk-go-v2 v1.20.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.32
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.38.1
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.39.1
 	github.com/go-logr/logr v1.2.4
 	github.com/go-logr/zapr v1.2.4
 	github.com/go-playground/validator/v10 v10.15.0
@@ -24,7 +24,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.10 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.11 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.31 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.7 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.37 // indirect
