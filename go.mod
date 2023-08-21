@@ -3,9 +3,9 @@ module github.com/Tanemahuta/aws-lambda-server
 go 1.20
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.20.2
+	github.com/aws/aws-sdk-go-v2 v1.20.3
 	github.com/aws/aws-sdk-go-v2/config v1.18.34
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.39.2
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.39.4
 	github.com/go-logr/logr v1.2.4
 	github.com/go-logr/zapr v1.2.4
 	github.com/go-playground/validator/v10 v10.15.1
@@ -24,17 +24,17 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.12 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.13 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.33 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.9 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.39 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.33 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.40 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.34 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.40 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.33 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.13.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.15.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.21.3 // indirect
-	github.com/aws/smithy-go v1.14.1 // indirect
+	github.com/aws/smithy-go v1.14.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
