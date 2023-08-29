@@ -44,11 +44,8 @@ func Collect[C prometheus.Collector](c C) map[string]float64 {
 
 func buildKey(labels []*dto.LabelPair) string {
 	var result strings.Builder
-	slices.SortFunc(labels, func(a, b *dto.LabelPair) bool {
-		if *a.Name == *b.Name {
-			return *a.Value < *b.Name
-		}
-		return *a.Name < *b.Name
+	slices.SortFunc(labels, func(a, b *dto.LabelPair) int {
+		return strings.Compare(*a.Name, *b.Name)
 	})
 	for idx, entry := range labels {
 		if idx > 0 {

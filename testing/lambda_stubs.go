@@ -36,9 +36,10 @@ func (l LambdaStubs) CanInvoke(_ context.Context, arn arn.ARN) error {
 }
 
 func (l LambdaStubs) Invoke(_ context.Context, arn arn.ARN, request *aws.LambdaRequest) (*aws.LambdaResponse, error) {
-	for _, stub := range l[arn.String()] {
-		if reflect.DeepEqual(&stub.Request, request) {
-			return &stub.Response, nil
+	stubs := l[arn.String()]
+	for idx := range stubs {
+		if reflect.DeepEqual(&stubs[idx].Request, request) {
+			return &stubs[idx].Response, nil
 		}
 	}
 	defer ginkgo.GinkgoRecover()
