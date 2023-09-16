@@ -41,7 +41,7 @@ jobs:
            --target-branch ${{ github.event.repository.default_branch }}\
            --helm-extra-set-args "
            --set-string=deployment.image.tag=${{ github.sha }} \
-           --set-string=deployment.image.repository=aws-lambda-server"\
-           --set-value=config.disableValidation=true
+           --set-string=deployment.image.repository=aws-lambda-server \
+           --set=config.disableValidation=true" \
            --debug
 
