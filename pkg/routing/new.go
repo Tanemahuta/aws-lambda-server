@@ -1,12 +1,12 @@
 package routing
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/handler"
-	"github.com/Tanemahuta/aws-lambda-server/testing/testcontext"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
@@ -20,7 +20,7 @@ func New(invoker lambda.Facade, cfg *config.Server, decorators ...Decorator) (ht
 	for fIdx, functionRoute := range cfg.Functions {
 		fnRef := lambda.FnRef{Name: functionRoute.GetName(), RoleARN: functionRoute.GetInvocationRoleARN()}
 		if !cfg.DisableValidation {
-			if err := invoker.CanInvoke(testcontext.New(), fnRef); err != nil {
+			if err := invoker.CanInvoke(context.TODO(), fnRef); err != nil {
 				return nil, err
 			}
 		}
