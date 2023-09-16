@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/errorx"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -21,14 +21,14 @@ func Run(ctx context.Context, serverConfig Config) error {
 	log.Info("reading config from", "filename", serverConfig.Filename)
 	var (
 		routerConfig  *config.Server
-		lambdaService aws.LambdaService
+		lambdaService lambda.Facade
 		requestRouter http.Handler
 		err           error
 	)
 	return errorx.Fns{
 		func() error {
 			log.Info("reading config file", "filename", serverConfig.Filename)
-			routerConfig, err = config.Read(serverConfig.Filename)
+			routerConfig, err = config.Read(ctx, serverConfig.Filename)
 			return errors.Wrapf(err, "could not read routerConfig '%v'", serverConfig.Filename)
 		},
 		func() error {
@@ -42,7 +42,7 @@ func Run(ctx context.Context, serverConfig Config) error {
 		},
 		func() error {
 			log.Info("creating server router")
-			requestRouter, err = routing.New(lambdaService, routerConfig.Functions, routing.MetricsDecorators...)
+			requestRouter, err = routing.New(lambdaService, routerConfig, routing.MetricsDecorators...)
 			return errors.Wrapf(err, "could not create server router '%v'", serverConfig.Filename)
 		},
 		func() error {

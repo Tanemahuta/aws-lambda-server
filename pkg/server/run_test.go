@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/metrics"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/server"
 	"github.com/Tanemahuta/aws-lambda-server/testing"
@@ -28,7 +28,7 @@ var _ = Describe("Run()", func() {
 			Filename:      "../config/testdata/config.yaml",
 			Listen:        ":8080",
 			MetricsListen: ":8081",
-			LambdaServiceFactory: func(context.Context) (aws.LambdaService, error) {
+			LambdaServiceFactory: func(context.Context) (lambda.Facade, error) {
 				return lambdaStubs, nil
 			},
 			RunFunc: func(ctx context.Context, listenAddr string, handler http.Handler) error {
@@ -79,22 +79,14 @@ var _ = Describe("Run()", func() {
 				Expect(io.ReadAll(response.Body)).To(BeEquivalentTo([]byte("test")))
 			})
 			It("should add metrics", func() {
-				Expect(metrics.Collect(metrics.HTTPRequestsTotal)).To(HaveKeyWithValue(
-					"code=202,functionArn=arn:aws:lambda:eu-central-1:123456789012:function:my-function,method=post",
+				labelMatcher := HaveKeyWithValue(
+					"code=202,functionName=test-function,invocationRole=arn:aws:iam::123456789012:role/test-role,method=post",
 					BeNumerically("==", 1),
-				))
-				Expect(metrics.Collect(metrics.HTTPRequestsDuration)).To(HaveKeyWithValue(
-					"code=202,functionArn=arn:aws:lambda:eu-central-1:123456789012:function:my-function,method=post",
-					BeNumerically("==", 1),
-				))
-				Expect(metrics.Collect(metrics.HTTPRequestsSize)).To(HaveKeyWithValue(
-					"code=202,functionArn=arn:aws:lambda:eu-central-1:123456789012:function:my-function,method=post",
-					BeNumerically("==", 1),
-				))
-				Expect(metrics.Collect(metrics.HTTPResponsesSize)).To(HaveKeyWithValue(
-					"code=202,functionArn=arn:aws:lambda:eu-central-1:123456789012:function:my-function,method=post",
-					BeNumerically("==", 1),
-				))
+				)
+				Expect(metrics.Collect(metrics.HTTPRequestsTotal)).To(labelMatcher)
+				Expect(metrics.Collect(metrics.HTTPRequestsDuration)).To(labelMatcher)
+				Expect(metrics.Collect(metrics.HTTPRequestsSize)).To(labelMatcher)
+				Expect(metrics.Collect(metrics.HTTPResponsesSize)).To(labelMatcher)
 			})
 		})
 		It("should serve metrics", func() {
@@ -119,7 +111,7 @@ var _ = Describe("Run()", func() {
 		Expect(server.Run(context.Background(), serverConfig)).To(MatchError(ContainSubstring("no such file or directory")))
 	})
 	It("should error from lambda factory", func() {
-		serverConfig.LambdaServiceFactory = func(_ context.Context) (aws.LambdaService, error) {
+		serverConfig.LambdaServiceFactory = func(_ context.Context) (lambda.Facade, error) {
 			return nil, errors.New("meh")
 		}
 		Expect(server.Run(context.Background(), serverConfig)).To(MatchError(ContainSubstring("meh")))

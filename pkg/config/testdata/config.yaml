@@ -1,10 +1,12 @@
 functions:
   # Multiple functions can be added here
-  - arn: "arn:aws:lambda:eu-central-1:123456789012:function:my-function" # Lambda function ARN
+  - name: "test-function" # Lambda function ARN
+    # Optional IAM role ARN to assume for invocation
+    invocationRole: "arn:aws:iam::123456789012:role/test-role"
     routes:
       - host: ""            # Optional host to be matched
         path: "/test"       # Either a path with vars (e.g. /test/{x})
         pathPrefix: ""      # or a path prefix
-        methods: [ "POST" ] # Optional methods to be routed (all methods, if empty)
+        methods: ["POST"] # Optional methods to be routed (all methods, if empty)
         headers: {}         # Optional headers to be matched (e.g. x: y)
         headersRegexp: {}   # Optional headers regexes to be matched (e.g. x: y.+)

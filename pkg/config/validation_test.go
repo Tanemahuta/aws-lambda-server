@@ -21,19 +21,19 @@ var _ = Describe("Validate()", func() {
 				}}
 			Expect(config.Validate(&config.Server{
 				Functions: []config.Function{
-					{ARN: validArn, Routes: []config.Route{{Path: "/"}}},
+					{ARN: &validArn, Routes: []config.Route{{Path: "/"}}},
 				},
 			})).NotTo(HaveOccurred())
 			Expect(config.Validate(&config.Server{
 				Functions: []config.Function{
-					{ARN: validArn, Routes: []config.Route{{PathPrefix: "/"}}},
+					{ARN: &validArn, Routes: []config.Route{{PathPrefix: "/"}}},
 				},
 			})).NotTo(HaveOccurred())
 		})
 		It("should error if functions are empty", func() {
 			Expect(config.Validate(&config.Server{})).To(MatchError(ContainSubstring("Functions")))
 		})
-		It("should error on ARN not set", func() {
+		It("should error on ARN and name not set", func() {
 			Expect(config.Validate(&config.Server{
 				Functions: []config.Function{
 					{
@@ -48,7 +48,7 @@ var _ = Describe("Validate()", func() {
 			Expect(config.Validate(&config.Server{
 				Functions: []config.Function{
 					{
-						ARN: config.LambdaARN{ARN: config.ARN{ARN: arn.ARN{
+						ARN: &config.LambdaARN{ARN: config.ARN{ARN: arn.ARN{
 							Partition: "aws",
 							Service:   "lambda",
 							Region:    "eu-central-1",
@@ -66,7 +66,7 @@ var _ = Describe("Validate()", func() {
 			Expect(config.Validate(&config.Server{
 				Functions: []config.Function{
 					{
-						ARN:    config.LambdaARN{ARN: config.ARN{ARN: arn.ARN{Region: "eu-central-1"}}},
+						ARN:    &config.LambdaARN{ARN: config.ARN{ARN: arn.ARN{Region: "eu-central-1"}}},
 						Routes: []config.Route{{}},
 					},
 				},
@@ -76,42 +76,4 @@ var _ = Describe("Validate()", func() {
 			)))
 		})
 	})
-	Context("ARN", func() {
-		var test *TestARN
-		BeforeEach(func() {
-			test = &TestARN{
-				ARN: config.LambdaARN{ARN: config.ARN{ARN: arn.ARN{
-					Partition: "aws",
-					Service:   "lambda",
-					Region:    "eu-central-1",
-					AccountID: "123456789012",
-					Resource:  "function:my-function",
-				}}},
-			}
-		})
-		It("should error on empty partition", func() {
-			test.ARN.Partition = ""
-			Expect(config.Validate(test)).To(MatchError(ContainSubstring("ARN")))
-		})
-		It("should error on empty service", func() {
-			test.ARN.Service = ""
-			Expect(config.Validate(test)).To(MatchError(ContainSubstring("ARN")))
-		})
-		It("should error on empty account", func() {
-			test.ARN.AccountID = ""
-			Expect(config.Validate(test)).To(MatchError(ContainSubstring("ARN")))
-		})
-		It("should error on invalid service", func() {
-			test.ARN.Service = "iam"
-			Expect(config.Validate(test)).To(MatchError(ContainSubstring("ARN")))
-		})
-		It("should error on invalid resource", func() {
-			test.ARN.Resource = "layer:my-layer"
-			Expect(config.Validate(test)).To(MatchError(ContainSubstring("ARN")))
-		})
-	})
 })
-
-type TestARN struct {
-	ARN config.LambdaARN `validate:"required"`
-}

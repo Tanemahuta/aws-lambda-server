@@ -1,31 +1,32 @@
 package routing
 
 import (
-	"context"
 	"net/http"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/handler"
+	"github.com/Tanemahuta/aws-lambda-server/testing/testcontext"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
 
 // Decorator for a http request.
-type Decorator func(decorated http.Handler, functionArn string) http.Handler
+type Decorator func(decorated http.Handler, ref lambda.FnRef) http.Handler
 
-// New creates a new http.Handler for the aws.LambdaService using the Server.
-func New(invoker aws.LambdaService, funcs []config.Function, decorators ...Decorator) (http.Handler, error) {
+// New creates a new http.Handler for the aws.Facade using the Server.
+func New(invoker lambda.Facade, cfg *config.Server, decorators ...Decorator) (http.Handler, error) {
 	result := mux.NewRouter()
-	for fIdx, functionRoute := range funcs {
-		if functionRoute.ARN.AccountID != "000000000000" { // This is a test account
-			if err := invoker.CanInvoke(context.TODO(), functionRoute.ARN.ARN.ARN); err != nil {
+	for fIdx, functionRoute := range cfg.Functions {
+		fnRef := lambda.FnRef{Name: functionRoute.GetName(), RoleARN: functionRoute.GetInvocationRoleARN()}
+		if !cfg.DisableValidation {
+			if err := invoker.CanInvoke(testcontext.New(), fnRef); err != nil {
 				return nil, err
 			}
 		}
-		var routeHandler http.Handler = &handler.Lambda{Invoker: invoker, ARN: functionRoute.ARN.ARN.ARN}
+		var routeHandler http.Handler = &handler.Lambda{Invoker: invoker, FnRef: fnRef}
 		for _, decorator := range decorators {
-			routeHandler = decorator(routeHandler, functionRoute.ARN.ARN.String())
+			routeHandler = decorator(routeHandler, fnRef)
 		}
 		for rIdx, routeCfg := range functionRoute.Routes {
 			route, err := ConfigureRoute(result.NewRoute(), routeCfg, (*mux.Route).GetError)

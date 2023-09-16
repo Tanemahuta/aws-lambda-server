@@ -29,12 +29,12 @@ spec:
         {{- include "aws-lambda-server.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - name: aws-lambda-server
+        - name: aws-lambdafn-server
           image: "{{ include "aws-lambda-server.image" . }}"
           imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
           ports:
             - containerPort: 8080
-              name: lambda
+              name: lambdafn
               protocol: TCP
             - containerPort: 8081
               name: metrics
@@ -59,7 +59,7 @@ spec:
             initialDelaySeconds: 2
             periodSeconds: 10
           volumeMounts:
-            - mountPath: /etc/aws-lambda-http-server
+            - mountPath: /etc/aws-lambdafn-http-server
               name: config
       {{- if not ( empty .Values.deployment.image.pullSecrets ) }}
       imagePullSecrets:

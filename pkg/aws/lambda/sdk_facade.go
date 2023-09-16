@@ -1,13 +1,12 @@
-package aws
+package lambda
 
 import (
 	"context"
 	"encoding/json"
 
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/sdk"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/errorx"
 	"github.com/aws/aws-sdk-go-v2/aws"
-
-	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
@@ -15,45 +14,48 @@ import (
 	"github.com/pkg/errors"
 )
 
-type SdkLambdaService func(ctx context.Context, params *lambda.InvokeInput, optFns ...func(*lambda.Options)) (
-	*lambda.InvokeOutput, error,
-)
+var _ Facade = &SdkFacade{}
 
-func (s SdkLambdaService) CanInvoke(ctx context.Context, arn arn.ARN) error {
+type SdkFacade struct {
+	Clients sdk.AssumeClients[sdk.Lambda]
+}
+
+func (s *SdkFacade) CanInvoke(ctx context.Context, ref FnRef) error {
 	log := logr.FromContextOrDiscard(ctx)
-	log.Info("checking if lambda can be invoked", "arn", arn)
-	functionName := arn.String()
-	_, err := s(ctx, &lambda.InvokeInput{
-		FunctionName:   &functionName,
+	log.Info("checking if lambda can be invoked", "ref", ref)
+	_, err := s.Clients.Get(ref.RoleARN).Invoke(ctx, &lambda.InvokeInput{
+		FunctionName:   &ref.Name,
+		LogType:        types.LogTypeNone,
 		InvocationType: types.InvocationTypeDryRun,
 	})
 	return err
 }
 
-func (s SdkLambdaService) Invoke(ctx context.Context, arn arn.ARN, request *LambdaRequest) (*LambdaResponse, error) {
+func (s *SdkFacade) Invoke(ctx context.Context, ref FnRef, req *Request) (*Response, error) {
 	var (
 		payload  []byte
 		response *lambda.InvokeOutput
-		result   *LambdaResponse
+		result   *Response
 		err      error
 	)
 	log := logr.FromContextOrDiscard(ctx)
 	err = errorx.Fns{
 		func() error {
-			payload, err = json.Marshal(request)
+			payload, err = json.Marshal(req)
 			return errors.Wrap(err, "could not marshal request")
 		},
 		func() error {
-			functionName := arn.String()
-			log.Info("invoking lambda function", "arn", arn)
-			response, err = s(ctx, &lambda.InvokeInput{
-				FunctionName:   &functionName,
-				InvocationType: types.InvocationTypeRequestResponse,
-				LogType:        types.LogTypeTail,
-				Payload:        payload,
-			})
+			log.Info("invoking lambda function", "ref", ref)
+			response, err = s.Clients.Get(ref.RoleARN).Invoke(ctx,
+				&lambda.InvokeInput{
+					FunctionName:   &ref.Name,
+					InvocationType: types.InvocationTypeRequestResponse,
+					LogType:        types.LogTypeNone,
+					Payload:        payload,
+				},
+			)
 			s.handleResponse(response)
-			return errors.Wrapf(err, "could not invoke lambda %v", arn)
+			return errors.Wrapf(err, "could not invoke lambda %v with role %v", ref.Name, ref.RoleARN)
 		},
 		func() error {
 			result, err = s.adaptResponse(log.V(1), response)
@@ -66,28 +68,27 @@ func (s SdkLambdaService) Invoke(ctx context.Context, arn arn.ARN, request *Lamb
 	return result, err
 }
 
-func (s SdkLambdaService) adaptResponse(log logr.Logger, response *lambda.InvokeOutput) (*LambdaResponse, error) {
+func (s *SdkFacade) adaptResponse(log logr.Logger, response *lambda.InvokeOutput) (*Response, error) {
 	log.Info("converting response", "response", response)
-	var result LambdaResponse
+	var result Response
 	if err := json.Unmarshal(response.Payload, &result); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal payload to response")
 	}
 	return &result, nil
 }
 
-func (s SdkLambdaService) handleResponse(response *lambda.InvokeOutput) {
+func (s *SdkFacade) handleResponse(response *lambda.InvokeOutput) {
 	if response == nil {
 		return
 	}
-	response.LogResult = HandleBase64String(response.LogResult)
 	response.Payload = HandleBase64(response.Payload)
 }
 
 // NewLambdaService from aws-sdk.
-func NewLambdaService(ctx context.Context) (LambdaService, error) {
+func NewLambdaService(ctx context.Context) (Facade, error) {
 	var (
 		cfg    aws.Config
-		result LambdaService
+		result Facade
 		err    error
 	)
 	err = errorx.Fns{
@@ -96,7 +97,7 @@ func NewLambdaService(ctx context.Context) (LambdaService, error) {
 			return err
 		},
 		func() error {
-			result = SdkLambdaService(lambda.NewFromConfig(cfg).Invoke)
+			result = &SdkFacade{Clients: sdk.NewAssumeClients[sdk.Lambda](sdk.LambdaClientProps(cfg))}
 			return nil
 		},
 	}.Run()

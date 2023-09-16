@@ -1,10 +1,10 @@
-package aws_test
+package lambda_test
 
 import (
 	_ "embed"
 	"encoding/json"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"gopkg.in/yaml.v3"
@@ -17,9 +17,9 @@ var headerJSONData []byte
 var headerYamlData []byte
 
 var _ = Describe("Headers", func() {
-	var sut aws.Headers
+	var sut lambda.Headers
 	BeforeEach(func() {
-		sut = aws.Headers{}
+		sut = lambda.Headers{}
 	})
 	Context("UnmarshalJSON()", func() {
 		It("should unmarshal different types correctly", func() {

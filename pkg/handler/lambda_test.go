@@ -2,14 +2,15 @@ package handler_test
 
 import (
 	"bytes"
-	"context"
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
+	"github.com/Tanemahuta/aws-lambda-server/mocks/mocklambda"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/handler"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/metrics"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
+	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -28,23 +29,21 @@ func (u UnreadableBody) Close() error {
 
 var _ = Describe("Lambda", func() {
 	var (
-		sut            *handler.Lambda
-		lambdaRequest  *aws.LambdaRequest
-		lambdaResponse *aws.LambdaResponse
-		errLambda      error
-		requestVars    map[string]string
-		httpRequest    *http.Request
-		httpResponse   *httptest.ResponseRecorder
+		ctrl          *gomock.Controller
+		invokerMock   *mocklambda.MockFacade
+		sut           *handler.Lambda
+		lambdaRequest *lambda.Request
+		requestVars   map[string]string
+		httpRequest   *http.Request
+		httpResponse  *httptest.ResponseRecorder
 	)
 	BeforeEach(func() {
-		lambdaArn := arn.ARN{
-			Partition: "aws", Service: "lambda", Region: "eu-central-1", AccountID: "0123456789012",
-			Resource: "function:my-function",
-		}
+		ctrl = gomock.NewController(GinkgoT())
+		invokerMock = mocklambda.NewMockFacade(ctrl)
 		requestVars = map[string]string{"a": "b"}
-		lambdaRequest = &aws.LambdaRequest{
+		lambdaRequest = &lambda.Request{
 			Host: "www.example.com",
-			Headers: aws.Headers{
+			Headers: lambda.Headers{
 				"Test": []string{"test"},
 			},
 			Method: http.MethodPost,
@@ -58,18 +57,14 @@ var _ = Describe("Lambda", func() {
 		)
 		httpRequest.Header.Set("test", "test")
 		httpResponse = httptest.NewRecorder()
-		lambdaResponse = nil
-		errLambda = nil
 		sut = &handler.Lambda{
-			Invoker: LambdaServiceFn(func(ctx context.Context, arn arn.ARN, r *aws.LambdaRequest) (
-				*aws.LambdaResponse, error,
-			) {
-				Expect(ctx).NotTo(BeNil())
-				Expect(arn).To(Equal(lambdaArn))
-				Expect(r).To(Equal(lambdaRequest))
-				return lambdaResponse, errLambda
-			}),
-			ARN: lambdaArn,
+			Invoker: invokerMock,
+			FnRef: lambda.FnRef{
+				Name: "test-function",
+				RoleARN: &arn.ARN{
+					Partition: "aws", Service: "iam", AccountID: "123456789012", Resource: "role/test-role",
+				},
+			},
 		}
 	})
 	AfterEach(func() {
@@ -78,12 +73,14 @@ var _ = Describe("Lambda", func() {
 		metrics.AwsLambdaInvocationDuration.Reset()
 	})
 	When("receiving a valid lambda response", func() {
+		var lambdaResponse *lambda.Response
 		BeforeEach(func() {
-			lambdaResponse = &aws.LambdaResponse{
+			lambdaResponse = &lambda.Response{
 				StatusCode: http.StatusAccepted,
-				Headers:    aws.Headers{"test": []string{"test"}},
-				Body:       aws.Body{Data: []byte("test")},
+				Headers:    lambda.Headers{"test": []string{"test"}},
+				Body:       lambda.Body{Data: []byte("test")},
 			}
+			invokerMock.EXPECT().Invoke(gomock.Any(), gomock.Eq(sut.FnRef), lambdaRequest).Return(lambdaResponse, nil)
 			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
 		})
 		It("should adapt to http correctly", func() {
@@ -92,15 +89,13 @@ var _ = Describe("Lambda", func() {
 			Expect(httpResponse.Body.String()).To(Equal(lambdaResponse.Body.String()))
 		})
 		It("should add metrics", func() {
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(HaveKeyWithValue(
-				"functionArn=arn:aws:lambda:eu-central-1:0123456789012:function:my-function",
+			labelMatcher := HaveKeyWithValue(
+				"functionName=test-function,invocationRole=arn:aws:iam::123456789012:role/test-role",
 				BeNumerically("==", 1),
-			))
+			)
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(labelMatcher)
 			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(BeEmpty())
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(HaveKeyWithValue(
-				"functionArn=arn:aws:lambda:eu-central-1:0123456789012:function:my-function",
-				BeNumerically("==", 1),
-			))
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(labelMatcher)
 		})
 	})
 	When("body cannot be read", func() {
@@ -119,7 +114,8 @@ var _ = Describe("Lambda", func() {
 	})
 	When("lambda errors", func() {
 		BeforeEach(func() {
-			errLambda = errors.New("meh")
+			invokerMock.EXPECT().Invoke(gomock.Any(), gomock.Eq(sut.FnRef), lambdaRequest).
+				Return(nil, errors.New("meh"))
 			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
 		})
 		It("should convert error to response code", func() {

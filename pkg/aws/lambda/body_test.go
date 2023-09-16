@@ -1,19 +1,19 @@
-package aws_test
+package lambda_test
 
 import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"gopkg.in/yaml.v3"
 )
 
 var _ = Describe("Body", func() {
-	var sut *aws.Body
+	var sut *lambda.Body
 	BeforeEach(func() {
-		sut = &aws.Body{}
+		sut = &lambda.Body{}
 	})
 	Context("UnmarshalJSON", func() {
 		It("should unmarshal byte slice", func() {

@@ -13,8 +13,12 @@ func Validate(config any) error {
 	validate := validator.New()
 	validate.RegisterStructValidation(validateARN, ARN{})
 	validate.RegisterStructValidation(
-		validateSpecARN[LambdaARN]("lambda", "function:"),
+		validateSpecARN[LambdaARN]("lambda", "function:", true),
 		LambdaARN{},
+	)
+	validate.RegisterStructValidation(
+		validateSpecARN[RoleARN]("iam", "role/", false),
+		RoleARN{},
 	)
 	return validate.Struct(config)
 }
@@ -25,10 +29,10 @@ func validateARN(sl validator.StructLevel) {
 
 func doValidateARN(sl validator.StructLevel, arn arn.ARN) {
 	if len(arn.Partition) == 0 {
-		sl.ReportError(arn, "Partition", "Partition", "partition-empty", "")
+		sl.ReportError(arn, "Partition", "Partition", "required", "")
 	}
 	if len(arn.Service) == 0 {
-		sl.ReportError(arn, "Service", "Service", "not-empty", "")
+		sl.ReportError(arn, "Service", "Service", "required", "")
 	}
 }
 
@@ -36,21 +40,28 @@ type arnProvider interface {
 	wrapped() arn.ARN
 }
 
-func validateSpecARN[T arnProvider](service, resourcePrefix string) validator.StructLevelFunc {
+func validateSpecARN[T arnProvider](service, resourcePrefix string, hasRegion bool) validator.StructLevelFunc {
 	return func(sl validator.StructLevel) {
 		tgt := sl.Current().Interface().(T).wrapped()
 		doValidateARN(sl, tgt)
 		if len(tgt.Partition) == 0 {
-			sl.ReportError(tgt, "Partition", "Partition", "partition-empty", "")
+			sl.ReportError(tgt, "Partition", "Partition", "required", "")
+		}
+		if hasRegion != (len(tgt.Region) > 0) {
+			tag := "required"
+			if !hasRegion {
+				tag = "empty"
+			}
+			sl.ReportError(tgt, "Region", "Region", tag, "")
 		}
 		if tgt.Service != service {
-			sl.ReportError(tgt, "Service", "Service", service, "")
+			sl.ReportError(tgt, "Service", "Service", "match="+service, "")
 		}
 		if len(tgt.AccountID) != 12 { //nolint:gomnd // meh.
-			sl.ReportError(tgt, "AccountID", "AccountID", "account-id", "")
+			sl.ReportError(tgt, "AccountID", "AccountID", "required", "")
 		}
 		if !strings.HasPrefix(tgt.Resource, resourcePrefix) {
-			sl.ReportError(tgt, "Resource", "Resource", resourcePrefix, "")
+			sl.ReportError(tgt, "Resource", "Resource", "prefix="+resourcePrefix, "")
 		}
 	}
 }

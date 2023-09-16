@@ -1,4 +1,4 @@
-package aws_test
+package lambda_test
 
 import (
 	"testing"

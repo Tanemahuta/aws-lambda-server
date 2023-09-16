@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/Tanemahuta/aws-lambda-server/buildinfo"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/go-logr/logr"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/server"
 	"github.com/go-logr/zapr"
 	"go.uber.org/zap"
@@ -22,7 +22,7 @@ func main() {
 		Filename:             "/etc/aws-lambda-http-server/config.yaml",
 		Listen:               ":8080",
 		MetricsListen:        ":8081",
-		LambdaServiceFactory: aws.NewLambdaService,
+		LambdaServiceFactory: lambda.NewLambdaService,
 		RunFunc: func(ctx context.Context, addr string, handler http.Handler) error {
 			httpSrv := &http.Server{
 				Addr:    addr,

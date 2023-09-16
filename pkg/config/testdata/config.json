@@ -1,7 +1,7 @@
 {
   "functions": [
     {
-      "arn": "arn:aws:lambda:eu-central-1:123456789012:function:my-function",
+      "name": "test-function",
       "routes": [
         {
           "methods": [
