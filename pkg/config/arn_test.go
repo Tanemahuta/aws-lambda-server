@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("ARN", func() {
+var _ = Describe("LambdaARN", func() {
 	var sut *config.ARN
 	BeforeEach(func() {
 		sut = &config.ARN{}

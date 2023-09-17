@@ -61,6 +61,7 @@ service:
 
 # Configuration example
 config:
+  disableValidation: false
   functions:
     - arn: "arn:aws:lambda:eu-central-1:000000000000:function:my-lambda-function"
       routes:

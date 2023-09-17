@@ -59,7 +59,7 @@ spec:
             initialDelaySeconds: 2
             periodSeconds: 10
           volumeMounts:
-            - mountPath: /etc/aws-lambda-http-server
+            - mountPath: /etc/aws-lambda-server
               name: config
       {{- if not ( empty .Values.deployment.image.pullSecrets ) }}
       imagePullSecrets:

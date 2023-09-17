@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/metrics"
-	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/go-logr/logr"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
@@ -17,9 +17,9 @@ import (
 // Lambda for invocation.
 type Lambda struct {
 	// Invoker to be used.
-	Invoker aws.LambdaService
-	// ARN of the function to be invoked.
-	ARN arn.ARN
+	Invoker lambda.Facade
+	// FnRef of the function to be invoked.
+	FnRef lambda.FnRef
 }
 
 func (r *Lambda) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -34,7 +34,7 @@ func (r *Lambda) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	response, err := r.invokeMetered(request, event)
 	if err != nil {
 		// Invocation failed
-		log.Error(err, "invocation of lambda failed", "arn", r.ARN)
+		log.Error(err, "invocation of lambda failed", "ref", r.FnRef)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -50,14 +50,17 @@ func (r *Lambda) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func (r *Lambda) invokeMetered(request *http.Request, event *aws.LambdaRequest) (*aws.LambdaResponse, error) {
+func (r *Lambda) invokeMetered(request *http.Request, event *lambda.Request) (*lambda.Response, error) {
 	now := time.Now()
 	var (
-		result *aws.LambdaResponse
+		result *lambda.Response
 		err    error
 	)
 	defer func() {
-		lbls := prometheus.Labels{metrics.FunctionArnLabel: r.ARN.String()}
+		lbls := prometheus.Labels{
+			metrics.FunctionNameLabel:      r.FnRef.Name,
+			metrics.InvocationRoleArnLabel: config.ArnAsString(r.FnRef.RoleARN),
+		}
 		metrics.AwsLambdaInvocationTotal.With(lbls).Inc()
 		metrics.AwsLambdaInvocationDuration.With(lbls).Observe(float64(time.Since(now)))
 		if err != nil {
@@ -65,14 +68,14 @@ func (r *Lambda) invokeMetered(request *http.Request, event *aws.LambdaRequest) 
 			metrics.AwsLambdaInvocationErrors.With(lbls).Inc()
 		}
 	}()
-	result, err = r.Invoker.Invoke(request.Context(), r.ARN, event)
+	result, err = r.Invoker.Invoke(request.Context(), r.FnRef, event)
 	return result, err
 }
 
-func (r *Lambda) adaptRequest(request *http.Request) (*aws.LambdaRequest, error) {
-	result := aws.LambdaRequest{
+func (r *Lambda) adaptRequest(request *http.Request) (*lambda.Request, error) {
+	result := lambda.Request{
 		Host:    request.Host,
-		Headers: aws.Headers(request.Header),
+		Headers: lambda.Headers(request.Header),
 		Method:  request.Method, URI: request.RequestURI,
 		Vars: mux.Vars(request),
 	}

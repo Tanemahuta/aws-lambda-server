@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 )
 
 // Config for the server.
@@ -16,7 +16,7 @@ type Config struct {
 	// MetricsListen address for metrics/health checks.
 	MetricsListen string
 	// LambdaServiceFactory to be used.
-	LambdaServiceFactory func(context.Context) (aws.LambdaService, error)
+	LambdaServiceFactory func(context.Context) (lambda.Facade, error)
 	// RunFunc which runs the server.
 	RunFunc func(context.Context, string, http.Handler) error
 }

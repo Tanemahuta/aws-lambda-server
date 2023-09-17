@@ -3,10 +3,11 @@ package testing
 import (
 	"context"
 	"fmt"
-	"reflect"
+	"strings"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/arn"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
+	"github.com/gonvenience/ytbx"
+	"github.com/homeport/dyff/pkg/dyff"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"github.com/pkg/errors"
@@ -14,11 +15,11 @@ import (
 )
 
 type LambdaStub struct {
-	Request  aws.LambdaRequest  `json:"requests"`
-	Response aws.LambdaResponse `json:"response"`
+	Request  lambda.Request  `json:"requests"`
+	Response lambda.Response `json:"response"`
 }
 
-var _ aws.LambdaService = LambdaStubs{}
+var _ lambda.Facade = LambdaStubs{}
 
 func NewLambdaStubs(yamlData []byte) LambdaStubs {
 	var result LambdaStubs
@@ -28,22 +29,51 @@ func NewLambdaStubs(yamlData []byte) LambdaStubs {
 
 type LambdaStubs map[string][]LambdaStub
 
-func (l LambdaStubs) CanInvoke(_ context.Context, arn arn.ARN) error {
-	if _, ok := l[arn.String()]; !ok {
-		return errors.Errorf("lambda %v not stubbed", arn)
+func (l LambdaStubs) CanInvoke(_ context.Context, fnRef lambda.FnRef) error {
+	if _, ok := l[fnRef.Name]; !ok {
+		return errors.Errorf("lambda %v not stubbed", fnRef.Name)
 	}
 	return nil
 }
 
-func (l LambdaStubs) Invoke(_ context.Context, arn arn.ARN, request *aws.LambdaRequest) (*aws.LambdaResponse, error) {
-	stubs := l[arn.String()]
+func (l LambdaStubs) Invoke(_ context.Context, fnRef lambda.FnRef, request *lambda.Request) (*lambda.Response, error) {
+	stubs, ok := l[fnRef.Name]
+	if !ok {
+		return nil, l.fail("no request for lambda '%v' stubbed", fnRef.Name)
+	}
+	diffs := make(map[int]dyff.Report)
 	for idx := range stubs {
-		if reflect.DeepEqual(&stubs[idx].Request, request) {
+		report := l.requestsMatch(&stubs[idx].Request, request)
+		if len(report.Diffs) == 0 {
 			return &stubs[idx].Response, nil
 		}
+		diffs[idx] = report
 	}
 	defer ginkgo.GinkgoRecover()
 	data, _ := yaml.Marshal(request)
-	ginkgo.Fail(fmt.Sprintf("request for '%v' not found:\n%v", arn, string(data)))
-	return nil, errors.Errorf("could not find request stub for lambda '%v': %v", arn, request)
+	var sb strings.Builder
+	for idx, report := range diffs {
+		sb.WriteString(fmt.Sprintf("# request %v:\n", idx))
+		_ = (&dyff.HumanReport{Report: report, DoNotInspectCerts: true, OmitHeader: true}).WriteReport(&sb)
+		sb.WriteString("\n")
+	}
+	return nil, l.fail("could not find request stub for lambda '%v': %v\n%v",
+		fnRef.Name, string(data), sb.String())
+}
+
+func (l LambdaStubs) fail(msg string, keyValues ...interface{}) error {
+	ginkgo.Fail(fmt.Sprintf(msg, keyValues...))
+	return errors.Errorf(msg, keyValues...)
+}
+
+func (l LambdaStubs) requestsMatch(lhs, rhs *lambda.Request) dyff.Report {
+	lhsFile, rhsFile := l.createDoc(lhs), l.createDoc(rhs)
+	report, _ := dyff.CompareInputFiles(lhsFile, rhsFile)
+	return report
+}
+
+func (l LambdaStubs) createDoc(req *lambda.Request) ytbx.InputFile {
+	data, _ := yaml.Marshal(req)
+	docs, _ := ytbx.LoadYAMLDocuments(data)
+	return ytbx.InputFile{Documents: docs}
 }

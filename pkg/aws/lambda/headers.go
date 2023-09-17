@@ -1,4 +1,4 @@
-package aws
+package lambda
 
 import (
 	"encoding/json"
@@ -16,9 +16,6 @@ var _ yaml.Unmarshaler = &Headers{}
 type Headers http.Header
 
 func (h *Headers) MarshalJSON() ([]byte, error) {
-	if h == nil {
-		return nil, nil
-	}
 	intermediate := make(map[string]string)
 	for k, v := range *h {
 		intermediate[k] = strings.Join(v, ",")

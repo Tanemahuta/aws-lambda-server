@@ -1,4 +1,4 @@
-"arn:aws:lambda:eu-central-1:123456789012:function:my-function":
+"test-function":
   - request:
       host: 127.0.0.1:65305
       header:
@@ -8,7 +8,6 @@
         User-Agent: Go-http-client/1.1
       method: POST
       uri: /test
-      vars: { }
       body:
         - 116
         - 101

@@ -7,13 +7,14 @@ import (
 )
 
 const (
-	FunctionArnLabel = "functionArn"
-	ErrorLabel       = "error"
+	FunctionNameLabel      = "functionName"
+	InvocationRoleArnLabel = "invocationRole"
+	ErrorLabel             = "error"
 )
 
 var (
-	AwsLambdaInvocationLabels = []string{FunctionArnLabel}
-	HTTPRequestLabels         = []string{"method", "code", FunctionArnLabel}
+	AwsLambdaInvocationLabels = []string{FunctionNameLabel, InvocationRoleArnLabel}
+	HTTPRequestLabels         = []string{"method", "code", FunctionNameLabel, InvocationRoleArnLabel}
 
 	HTTPRequestsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "http_requests_total", Help: "total count of http requests",

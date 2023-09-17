@@ -5,12 +5,13 @@ import (
 	"flag"
 	"net"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Tanemahuta/aws-lambda-server/buildinfo"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/go-logr/logr"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/aws"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/server"
 	"github.com/go-logr/zapr"
 	"go.uber.org/zap"
@@ -19,10 +20,10 @@ import (
 func main() {
 	devel := false
 	serverConfig := server.Config{
-		Filename:             "/etc/aws-lambda-http-server/config.yaml",
+		Filename:             "/etc/aws-lambda-server/config.yaml",
 		Listen:               ":8080",
 		MetricsListen:        ":8081",
-		LambdaServiceFactory: aws.NewLambdaService,
+		LambdaServiceFactory: lambda.NewLambdaService,
 		RunFunc: func(ctx context.Context, addr string, handler http.Handler) error {
 			httpSrv := &http.Server{
 				Addr:    addr,
@@ -53,7 +54,7 @@ func main() {
 		panic(err)
 	}
 	log := zapr.NewLogger(zapLog)
-	log.Info("starting aws-lambda-http-server",
+	log.Info("starting aws-lambda-server",
 		"version", buildinfo.Version(),
 		"commitSHA", buildinfo.CommitSHA(),
 		"timestamp", buildinfo.Timestamp(),
@@ -61,6 +62,7 @@ func main() {
 	ctx := logr.NewContext(context.Background(), log)
 	if err = server.Run(ctx, serverConfig); err != nil {
 		log.Error(err, "could not run server")
+		os.Exit(1)
 	}
 }
 

@@ -1,7 +1,7 @@
-package aws
+package lambda
 
-// LambdaResponse from the invocation.
-type LambdaResponse struct {
+// Response from the invocation.
+type Response struct {
 	// StatusCode for the http response.
 	StatusCode int `json:"statusCode" yaml:"statusCode"`
 	// Headers to be appended.
