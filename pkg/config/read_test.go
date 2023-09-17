@@ -13,6 +13,7 @@ import (
 var _ = Describe("Read()", func() {
 	It("should read YAML correctly", func() {
 		Expect(config.Read(testcontext.New(), "testdata/config.yaml")).To(Equal(&config.Server{
+			DisableValidation: true,
 			Functions: []config.Function{
 				{
 					Name: "test-function",

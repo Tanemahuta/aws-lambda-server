@@ -1,3 +1,4 @@
+disableValidation: true
 functions:
   # Multiple functions can be added here
   - name: "test-function" # Lambda function ARN
