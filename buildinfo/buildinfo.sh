@@ -1,4 +1,5 @@
 #!/bin/sh
+
 rm -f buildinfo.txt
 if [ -z "${VERSION}" ]; then
   VERSION="local-development"

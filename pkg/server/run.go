@@ -18,7 +18,6 @@ import (
 
 func Run(ctx context.Context, serverConfig Config) error {
 	log := logr.FromContextOrDiscard(ctx)
-	log.Info("reading config from", "filename", serverConfig.Filename)
 	var (
 		routerConfig  *config.Server
 		lambdaService lambda.Facade

@@ -1,10 +1,9 @@
 name: "verify"
 on:
-  push:
-    branches: ["main"]
-    tags: ["v*.*.*"]
   pull_request:
     branches: ["main"]
+  workflow_call:
+    inputs: {}
 jobs:
   changes:
     runs-on: ubuntu-latest

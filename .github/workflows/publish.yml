@@ -1,11 +1,7 @@
 name: "publish"
 on:
-  workflow_run:
-    workflows: ["verify"]
-    types:
-      - completed
-    branches: ["main"]
-    tags: ["v*.*.*"]
+  workflow_call:
+    inputs: {}
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: tanemahuta/aws-lambda-server
