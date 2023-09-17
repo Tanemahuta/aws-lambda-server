@@ -20,6 +20,7 @@ var _ = Describe("New()", func() {
 	BeforeEach(func() {
 		var err error
 		cfg, err = config.Read(testcontext.New(), "../config/testdata/config.yaml")
+		cfg.DisableValidation = false
 		Expect(err).NotTo(HaveOccurred())
 		stubs = testing.DefaultLambdaStubs()
 	})
