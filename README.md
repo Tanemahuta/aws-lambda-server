@@ -86,7 +86,7 @@ which will result in a `{"Hello":"World"}` in the server's HTTP response body.
 When running the [binary](main.go), the following command line parameters can be used:
 
 - `--devel=(true|false)`: run in development mode (logging)
-- `--config-file=<path>`: use the provided config file (default: `/etc/aws-lambda-http-server/config.yaml`)
+- `--config-file=<path>`: use the provided config file (default: `/etc/aws-lambda-server/config.yaml`)
 - `--listen=<addr>`: use the provided listen address (default: `:8080`) for serving the requests towards the lambda
 - `--metrics-listen=<addr>`: use the provided listen address (default: `:8081`) for serving metrics/health/readiness
   checks

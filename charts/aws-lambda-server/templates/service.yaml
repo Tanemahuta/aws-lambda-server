@@ -27,7 +27,7 @@ spec:
   ports:
     - port: 8080
       protocol: TCP
-      name: lambdafn
-      targetPort: lambdafn
+      name: lambda
+      targetPort: lambda
   selector:
     {{- include "aws-lambda-server.selectorLabels" . | nindent 4 }}

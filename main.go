@@ -5,6 +5,7 @@ import (
 	"flag"
 	"net"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Tanemahuta/aws-lambda-server/buildinfo"
@@ -19,7 +20,7 @@ import (
 func main() {
 	devel := false
 	serverConfig := server.Config{
-		Filename:             "/etc/aws-lambda-http-server/config.yaml",
+		Filename:             "/etc/aws-lambda-server/config.yaml",
 		Listen:               ":8080",
 		MetricsListen:        ":8081",
 		LambdaServiceFactory: lambda.NewLambdaService,
@@ -53,7 +54,7 @@ func main() {
 		panic(err)
 	}
 	log := zapr.NewLogger(zapLog)
-	log.Info("starting aws-lambda-http-server",
+	log.Info("starting aws-lambda-server",
 		"version", buildinfo.Version(),
 		"commitSHA", buildinfo.CommitSHA(),
 		"timestamp", buildinfo.Timestamp(),
@@ -61,6 +62,7 @@ func main() {
 	ctx := logr.NewContext(context.Background(), log)
 	if err = server.Run(ctx, serverConfig); err != nil {
 		log.Error(err, "could not run server")
+		os.Exit(1)
 	}
 }
 
