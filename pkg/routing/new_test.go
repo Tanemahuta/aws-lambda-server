@@ -54,7 +54,7 @@ var _ = Describe("New()", func() {
 					Resource:  "role/test-role",
 				},
 			})),
-			HaveField("Timeout", BeNumerically("==", 60000000000)),
+			HaveField("Timeout", BeNumerically("==", 240000000000)),
 		))
 	})
 	It("should error in case the lambda cannot be invoked", func() {

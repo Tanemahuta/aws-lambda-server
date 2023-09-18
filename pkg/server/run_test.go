@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"time"
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
@@ -34,7 +35,12 @@ var _ = Describe("Run()", func() {
 			},
 			RunFunc: func(ctx context.Context, listenAddr string, handler http.Handler, httpCfg *config.HTTP) error {
 				defer GinkgoRecover()
-				Expect(httpCfg.RequestTimeout.Duration).To(BeNumerically(">", 0))
+				Expect(httpCfg).To(Equal(&config.HTTP{
+					ReadHeaderTimeout: config.Duration{Duration: time.Minute * 1},
+					ReadTimeout:       config.Duration{Duration: time.Minute * 2},
+					WriteTimeout:      config.Duration{Duration: time.Minute * 3},
+					EnableTraceparent: true,
+				}))
 				switch listenAddr {
 				case serverConfig.Listen:
 					lambdaServer = httptest.NewServer(handler)
