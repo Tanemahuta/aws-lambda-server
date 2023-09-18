@@ -26,7 +26,7 @@ type Lambda struct {
 }
 
 func (r *Lambda) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	log := logr.FromContextOrDiscard(request.Context())
+	log := logr.FromContextOrDiscard(request.Context()).WithValues("ref", r.FnRef)
 	event, err := r.adaptRequest(request)
 	if err != nil {
 		// Request could not be converted
@@ -37,8 +37,17 @@ func (r *Lambda) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	response, err := r.invokeMetered(request, event)
 	if err != nil {
 		// Invocation failed
-		log.Error(err, "invocation of lambda failed", "ref", r.FnRef)
-		writer.WriteHeader(http.StatusInternalServerError)
+		switch {
+		case errors.Is(err, context.DeadlineExceeded):
+			log.Error(err, "lambda invocation timed out")
+			writer.WriteHeader(http.StatusGatewayTimeout)
+		case errors.Is(err, context.Canceled):
+			log.Error(err, "context was canceled elsewhere")
+			writer.WriteHeader(http.StatusInternalServerError)
+		default:
+			log.Error(err, "invocation of lambda failed")
+			writer.WriteHeader(http.StatusInternalServerError)
+		}
 		return
 	}
 	// Otherwise apply the response to the writer.

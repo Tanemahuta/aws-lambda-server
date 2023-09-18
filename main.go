@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/Tanemahuta/aws-lambda-server/buildinfo"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
@@ -27,15 +26,14 @@ func main() {
 		LambdaServiceFactory: lambda.NewLambdaService,
 		RunFunc: func(ctx context.Context, addr string, handler http.Handler, httpCfg *config.HTTP) error {
 			httpSrv := &http.Server{
-				Addr:    addr,
-				Handler: handler,
+				Addr:              addr,
+				Handler:           handler,
+				ReadHeaderTimeout: httpCfg.ReadHeaderTimeout.Duration,
+				ReadTimeout:       httpCfg.ReadTimeout.Duration,
+				WriteTimeout:      httpCfg.WriteTimeout.Duration,
 				BaseContext: func(net.Listener) context.Context {
 					return ctx
 				},
-				ReadHeaderTimeout: time.Millisecond * 500, //nolint:gomnd // just no.
-			}
-			if writeTimeout := httpCfg.RequestTimeout.Duration; writeTimeout > 0 {
-				httpSrv.WriteTimeout = writeTimeout
 			}
 			return httpSrv.ListenAndServe()
 		},

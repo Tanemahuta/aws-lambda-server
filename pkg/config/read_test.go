@@ -15,7 +15,9 @@ var _ = Describe("Read()", func() {
 	It("should read YAML correctly", func() {
 		Expect(config.Read(testcontext.New(), "testdata/config.yaml")).To(Equal(&config.Server{
 			HTTP: config.HTTP{
-				RequestTimeout:    config.Duration{Duration: time.Minute * 2},
+				ReadHeaderTimeout: config.Duration{Duration: time.Minute * 1},
+				ReadTimeout:       config.Duration{Duration: time.Minute * 2},
+				WriteTimeout:      config.Duration{Duration: time.Minute * 3},
 				EnableTraceparent: true,
 			},
 			DisableValidation: true,
@@ -34,7 +36,7 @@ var _ = Describe("Read()", func() {
 							Headers: map[string]string{}, HeadersRegexp: map[string]string{},
 						},
 					},
-					Timeout: config.Duration{Duration: time.Minute},
+					Timeout: config.Duration{Duration: time.Minute * 4},
 				},
 			},
 		}))

@@ -11,6 +11,7 @@ import (
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/handler"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/metrics"
+	"github.com/Tanemahuta/aws-lambda-server/testing/testcontext"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
@@ -53,10 +54,14 @@ var _ = Describe("Lambda", func() {
 			Vars:   requestVars,
 			Body:   []byte("test"),
 		}
-		httpRequest = mux.SetURLVars(
-			httptest.NewRequest(http.MethodPost, "http://www.example.com/test", bytes.NewBufferString("test")),
-			requestVars,
+		const url = "http://www.example.com/test"
+		request, err := http.NewRequestWithContext(
+			testcontext.New(), http.MethodPost, url, bytes.NewBufferString("test"),
 		)
+		Expect(err).NotTo(HaveOccurred())
+		request.RequestURI = url
+		request.RemoteAddr = "192.0.2.1:1234"
+		httpRequest = mux.SetURLVars(request, requestVars)
 		httpRequest.Header.Set("test", "test")
 		httpResponse = httptest.NewRecorder()
 		sut = &handler.Lambda{
@@ -101,29 +106,16 @@ var _ = Describe("Lambda", func() {
 		})
 	})
 	When("invoking with timeout", func() {
-		var lambdaResponse *lambda.Response
 		BeforeEach(func() {
-			lambdaResponse = &lambda.Response{
-				StatusCode: http.StatusAccepted,
-				Headers:    lambda.Headers{"test": []string{"test"}},
-				Body:       lambda.Body{Data: []byte("test")},
-			}
-			sut.Timeout = time.Minute
+			sut.Timeout = time.Nanosecond
+			<-time.After(sut.Timeout)
 			invokerMock.EXPECT().Invoke(gomock.Any(), gomock.Eq(sut.FnRef), lambdaRequest).DoAndReturn(
 				func(ctx context.Context, ref lambda.FnRef, request *lambda.Request) (*lambda.Response, error) {
-					defer GinkgoRecover()
-					_, ok := ctx.Deadline()
-					Expect(ok).To(BeTrue())
-					return lambdaResponse, nil
+					return nil, ctx.Err()
 				})
 			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
+			Expect(httpResponse.Code).To(Equal(http.StatusGatewayTimeout))
 		})
-		It("should adapt to http correctly", func() {
-			Expect(httpResponse.Code).To(Equal(lambdaResponse.StatusCode))
-			Expect(httpResponse.Header()).To(Equal(http.Header{"Test": []string{"test"}}))
-			Expect(httpResponse.Body.String()).To(Equal(lambdaResponse.Body.String()))
-		})
-
 	})
 	When("body cannot be read", func() {
 		BeforeEach(func() {

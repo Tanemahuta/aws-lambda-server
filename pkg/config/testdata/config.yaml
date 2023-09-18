@@ -2,15 +2,19 @@ disableValidation: true
 http:
   # Optional: enable open telemetry trace parent
   enableTraceparent: true
-  # Optional: Set a request timeout
-  requestTimeout: 2m
+  # Optional: Set a read timeout
+  readHeaderTimeout: 1m
+  # Optional: Set a read timeout
+  readTimeout: 2m
+  # Optional: Set a read timeout
+  writeTimeout: 3m
 functions:
   # Multiple functions can be added here
   - name: "test-function" # Lambda function ARN
     # Optional: IAM role ARN to assume for invocation
     invocationRole: "arn:aws:iam::123456789012:role/test-role"
     # Optional: timeout for function invocation
-    timeout: 1m
+    timeout: 4m
     routes:
       - host: ""            # Optional: host to be matched
         path: "/test"       # Either a path with vars (e.g. /test/{x})
