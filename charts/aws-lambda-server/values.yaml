@@ -68,7 +68,7 @@ config:
     # Optional: Set a read timeout (e.g. 2m)
     writeTimeout: ~
     # Optional: Set a read timeout (e.g. 2m)
-    readHeaderTimeout: 2s
+    readHeaderTimeout: ~
   # Disable validation of the lambda invocation (dry-run) on startup
   disableValidation: false
   functions:
