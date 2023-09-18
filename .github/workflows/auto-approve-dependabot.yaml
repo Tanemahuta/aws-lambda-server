@@ -1,4 +1,4 @@
-name: Dependabot reviewer
+name: auto-approve dependabot
 
 on: pull_request_target
 
@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 jobs:
-  review-dependabot-pr:
+  auto-merge-pr:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
