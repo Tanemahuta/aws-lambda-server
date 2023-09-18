@@ -26,7 +26,7 @@ func CommitSHA() string {
 
 // Timestamp for the build.
 func Timestamp() string {
-	return buildInfo.commitSHA
+	return buildInfo.timestamp
 }
 
 //nolint:gochecknoinits // this is a static initialization.
