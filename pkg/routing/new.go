@@ -24,7 +24,9 @@ func New(invoker lambda.Facade, cfg *config.Server, decorators ...Decorator) (ht
 				return nil, err
 			}
 		}
-		var routeHandler http.Handler = &handler.Lambda{Invoker: invoker, FnRef: fnRef}
+		var routeHandler http.Handler = &handler.Lambda{
+			Invoker: invoker, FnRef: fnRef, Timeout: functionRoute.Timeout.Duration,
+		}
 		for _, decorator := range decorators {
 			routeHandler = decorator(routeHandler, fnRef)
 		}

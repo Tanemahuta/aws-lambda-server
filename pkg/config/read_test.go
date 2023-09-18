@@ -2,6 +2,7 @@ package config_test
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/Tanemahuta/aws-lambda-server/testing/testcontext"
@@ -13,6 +14,10 @@ import (
 var _ = Describe("Read()", func() {
 	It("should read YAML correctly", func() {
 		Expect(config.Read(testcontext.New(), "testdata/config.yaml")).To(Equal(&config.Server{
+			HTTP: config.HTTP{
+				RequestTimeout:    config.Duration{Duration: time.Minute * 2},
+				EnableTraceparent: true,
+			},
 			DisableValidation: true,
 			Functions: []config.Function{
 				{
@@ -29,6 +34,7 @@ var _ = Describe("Read()", func() {
 							Headers: map[string]string{}, HeadersRegexp: map[string]string{},
 						},
 					},
+					Timeout: config.Duration{Duration: time.Minute},
 				},
 			},
 		}))

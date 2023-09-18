@@ -2,8 +2,10 @@ package handler_test
 
 import (
 	"bytes"
+	"context"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/Tanemahuta/aws-lambda-server/mocks/mocklambda"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
@@ -97,6 +99,31 @@ var _ = Describe("Lambda", func() {
 			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(BeEmpty())
 			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(labelMatcher)
 		})
+	})
+	When("invoking with timeout", func() {
+		var lambdaResponse *lambda.Response
+		BeforeEach(func() {
+			lambdaResponse = &lambda.Response{
+				StatusCode: http.StatusAccepted,
+				Headers:    lambda.Headers{"test": []string{"test"}},
+				Body:       lambda.Body{Data: []byte("test")},
+			}
+			sut.Timeout = time.Minute
+			invokerMock.EXPECT().Invoke(gomock.Any(), gomock.Eq(sut.FnRef), lambdaRequest).DoAndReturn(
+				func(ctx context.Context, ref lambda.FnRef, request *lambda.Request) (*lambda.Response, error) {
+					defer GinkgoRecover()
+					_, ok := ctx.Deadline()
+					Expect(ok).To(BeTrue())
+					return lambdaResponse, nil
+				})
+			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
+		})
+		It("should adapt to http correctly", func() {
+			Expect(httpResponse.Code).To(Equal(lambdaResponse.StatusCode))
+			Expect(httpResponse.Header()).To(Equal(http.Header{"Test": []string{"test"}}))
+			Expect(httpResponse.Body.String()).To(Equal(lambdaResponse.Body.String()))
+		})
+
 	})
 	When("body cannot be read", func() {
 		BeforeEach(func() {

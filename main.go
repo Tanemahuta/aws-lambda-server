@@ -10,6 +10,7 @@ import (
 
 	"github.com/Tanemahuta/aws-lambda-server/buildinfo"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/go-logr/logr"
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/server"
@@ -24,7 +25,7 @@ func main() {
 		Listen:               ":8080",
 		MetricsListen:        ":8081",
 		LambdaServiceFactory: lambda.NewLambdaService,
-		RunFunc: func(ctx context.Context, addr string, handler http.Handler) error {
+		RunFunc: func(ctx context.Context, addr string, handler http.Handler, httpCfg *config.HTTP) error {
 			httpSrv := &http.Server{
 				Addr:    addr,
 				Handler: handler,
@@ -32,6 +33,9 @@ func main() {
 					return ctx
 				},
 				ReadHeaderTimeout: time.Millisecond * 500, //nolint:gomnd // just no.
+			}
+			if writeTimeout := httpCfg.RequestTimeout.Duration; writeTimeout > 0 {
+				httpSrv.WriteTimeout = writeTimeout
 			}
 			return httpSrv.ListenAndServe()
 		},

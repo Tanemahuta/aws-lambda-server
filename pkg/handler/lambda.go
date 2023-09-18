@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"time"
@@ -20,6 +21,8 @@ type Lambda struct {
 	Invoker lambda.Facade
 	// FnRef of the function to be invoked.
 	FnRef lambda.FnRef
+	// Timeout (optional) for the request.
+	Timeout time.Duration
 }
 
 func (r *Lambda) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -68,7 +71,13 @@ func (r *Lambda) invokeMetered(request *http.Request, event *lambda.Request) (*l
 			metrics.AwsLambdaInvocationErrors.With(lbls).Inc()
 		}
 	}()
-	result, err = r.Invoker.Invoke(request.Context(), r.FnRef, event)
+	ctx := request.Context()
+	if r.Timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, r.Timeout)
+		defer cancel()
+	}
+	result, err = r.Invoker.Invoke(ctx, r.FnRef, event)
 	return result, err
 }
 

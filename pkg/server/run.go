@@ -48,7 +48,7 @@ func Run(ctx context.Context, serverConfig Config) error {
 			group, runCtx := errgroup.WithContext(ctx)
 			group.Go(func() error {
 				log.Info("handling requests")
-				return serverConfig.RunFunc(runCtx, serverConfig.Listen, requestRouter)
+				return serverConfig.RunFunc(runCtx, serverConfig.Listen, requestRouter, &routerConfig.HTTP)
 			})
 			group.Go(func() error {
 				log.Info("handling metrics")
@@ -56,7 +56,7 @@ func Run(ctx context.Context, serverConfig Config) error {
 				metricsRouter.NewRoute().Methods(http.MethodGet).Path("/metrics").Handler(promhttp.Handler())
 				metricsRouter.NewRoute().Methods(http.MethodGet).Path("/healthz").HandlerFunc(ping)
 				metricsRouter.NewRoute().Methods(http.MethodGet).Path("/readyz").HandlerFunc(ping)
-				return serverConfig.RunFunc(runCtx, serverConfig.MetricsListen, metricsRouter)
+				return serverConfig.RunFunc(runCtx, serverConfig.MetricsListen, metricsRouter, &routerConfig.HTTP)
 			})
 			return group.Wait()
 		},
