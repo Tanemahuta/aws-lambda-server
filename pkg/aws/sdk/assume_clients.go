@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
@@ -68,5 +69,5 @@ func (l *assumeClients[C]) create(role *arn.ARN) C {
 		l.stsClient = sts.NewFromConfig(l.props.Config)
 	}
 	// Create a new client assuming the role and caching the credentials
-	return l.props.NewClient(l.props.Config, l.props.Config.Credentials)
+	return l.props.NewClient(l.props.Config, stscreds.NewAssumeRoleProvider(l.stsClient, role.String()))
 }
