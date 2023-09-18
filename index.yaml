@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   aws-lambda-server:
   - apiVersion: v1
+    appVersion: 1.2.1
+    created: "2023-09-18T06:07:54.305666879Z"
+    description: aws-lambda-server invokes aws lambda functions from HTTP requests
+    digest: 2fbd69ba425e7139736667c8eb5266c11feefb0ab3d73aff888746abb36dd63f
+    home: https://github.com/Tanemahuta/aws-lambda-server
+    keywords:
+    - AWS
+    - Amazon Web Services
+    - Lambda
+    - Function
+    - HTTP
+    - Server
+    maintainers:
+    - email: christian.heike@icloud.com
+      name: Tanemahuta
+    name: aws-lambda-server
+    sources:
+    - https://github.com/Tanemahuta/aws-lambda-server/charts/aws-lambda-server
+    urls:
+    - aws-lambda-server-1.1.1.tgz
+    version: 1.1.1
+  - apiVersion: v1
     appVersion: 1.1.0
     created: "2023-05-31T19:15:53.94832828Z"
     description: aws-lambda-server invokes aws lambda functions from HTTP requests
@@ -22,4 +44,4 @@ entries:
     urls:
     - https://github.com/Tanemahuta/aws-lambda-server/releases/download/aws-lambda-server-1.0.0/aws-lambda-server-1.0.0.tgz
     version: 1.0.0
-generated: "2023-05-31T19:15:53.94833378Z"
+generated: "2023-09-18T06:07:54.305679279Z"
