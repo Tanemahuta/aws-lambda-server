@@ -62,8 +62,10 @@ service:
 # Configuration example
 config:
   disableValidation: false
+  requestTimeout: 2m
   functions:
     - arn: "arn:aws:lambda:eu-central-1:000000000000:function:my-lambda-function"
+      timeout: 1m
       routes:
         - path: "/"
           methods: ["GET"]
