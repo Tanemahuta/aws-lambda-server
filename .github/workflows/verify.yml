@@ -39,12 +39,12 @@ jobs:
   golang:
     needs: changes
     uses: ./.github/workflows/verify-go.yaml
-    if: needs.changes.outputs.golang == 'true'
+    if: needs.changes.outputs.golang == 'true' || startsWith(github.ref, 'refs/tags/')
   docker:
     needs: changes
     uses: ./.github/workflows/verify-docker.yaml
-    if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.docker == 'true'
+    if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.docker == 'true' || startsWith(github.ref, 'refs/tags/')
   helm:
     needs: changes
     uses: ./.github/workflows/verify-helm.yaml
-    if: needs.changes.outputs.helm == 'true'
+    if: needs.changes.outputs.helm == 'true' || startsWith(github.ref, 'refs/tags/')
