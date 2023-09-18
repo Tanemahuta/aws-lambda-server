@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/metrics"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/server"
 	"github.com/Tanemahuta/aws-lambda-server/testing"
@@ -31,7 +32,9 @@ var _ = Describe("Run()", func() {
 			LambdaServiceFactory: func(context.Context) (lambda.Facade, error) {
 				return lambdaStubs, nil
 			},
-			RunFunc: func(ctx context.Context, listenAddr string, handler http.Handler) error {
+			RunFunc: func(ctx context.Context, listenAddr string, handler http.Handler, httpCfg *config.HTTP) error {
+				defer GinkgoRecover()
+				Expect(httpCfg.RequestTimeout.Duration).To(BeNumerically(">", 0))
 				switch listenAddr {
 				case serverConfig.Listen:
 					lambdaServer = httptest.NewServer(handler)

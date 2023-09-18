@@ -15,6 +15,8 @@ type Function struct {
 	InvocationRole *RoleARN `json:"invocationRole,omitempty" yaml:"invocationRole,omitempty" validate:"omitempty"`
 	// Routes to be added for that function.
 	Routes []Route `json:"routes" yaml:"routes" validate:"min=1,dive"`
+	// Timeout for the function invocation.
+	Timeout Duration `json:"timeout,omitempty" yaml:"timeout,omitempty"`
 }
 
 // GetName of the function.
