@@ -46,15 +46,17 @@ func (s *SdkFacade) Invoke(ctx context.Context, ref FnRef, req *Request) (*Respo
 		},
 		func() error {
 			log.Info("invoking lambda function", "ref", ref)
-			response, err = s.Clients.Get(ref.RoleARN).Invoke(ctx,
+			response, err = s.handleResponse(s.Clients.Get(ref.RoleARN).Invoke(ctx,
 				&lambda.InvokeInput{
 					FunctionName:   &ref.Name,
 					InvocationType: types.InvocationTypeRequestResponse,
 					LogType:        types.LogTypeNone,
 					Payload:        payload,
 				},
-			)
-			s.handleResponse(response)
+			))
+			if err != nil && response != nil && response.LogResult != nil {
+				log.Error(err, *response.LogResult)
+			}
 			return errors.Wrapf(err, "could not invoke lambda %v with role %v", ref.Name, ref.RoleARN)
 		},
 		func() error {
@@ -77,11 +79,15 @@ func (s *SdkFacade) adaptResponse(log logr.Logger, response *lambda.InvokeOutput
 	return &result, nil
 }
 
-func (s *SdkFacade) handleResponse(response *lambda.InvokeOutput) {
-	if response == nil {
-		return
+func (s *SdkFacade) handleResponse(response *lambda.InvokeOutput, err error) (*lambda.InvokeOutput, error) {
+	if err != nil {
+		return nil, err
 	}
 	response.Payload = HandleBase64(response.Payload)
+	if response.FunctionError != nil {
+		err = errors.Errorf("error '%v' details '%v'", *response.FunctionError, string(response.Payload))
+	}
+	return response, err
 }
 
 // NewLambdaService from aws-sdk.

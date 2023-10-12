@@ -37,8 +37,11 @@ var _ = Describe("Lambda", func() {
 		sut           *handler.Lambda
 		lambdaRequest *lambda.Request
 		requestVars   map[string]string
+		ctx           context.Context
+		cancel        context.CancelFunc
 		httpRequest   *http.Request
 		httpResponse  *httptest.ResponseRecorder
+		invLabels     OmegaMatcher
 	)
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
@@ -55,8 +58,9 @@ var _ = Describe("Lambda", func() {
 			Body:   []byte("test"),
 		}
 		const url = "http://www.example.com/test"
+		ctx, cancel = context.WithCancel(testcontext.New())
 		request, err := http.NewRequestWithContext(
-			testcontext.New(), http.MethodPost, url, bytes.NewBufferString("test"),
+			ctx, http.MethodPost, url, bytes.NewBufferString("test"),
 		)
 		Expect(err).NotTo(HaveOccurred())
 		request.RequestURI = url
@@ -73,11 +77,16 @@ var _ = Describe("Lambda", func() {
 				},
 			},
 		}
+		invLabels = HaveKeyWithValue(
+			"functionName=test-function,invocationRole=arn:aws:iam::123456789012:role/test-role",
+			BeNumerically("==", 1),
+		)
 	})
 	AfterEach(func() {
 		metrics.AwsLambdaInvocationTotal.Reset()
 		metrics.AwsLambdaInvocationErrors.Reset()
 		metrics.AwsLambdaInvocationDuration.Reset()
+		cancel()
 	})
 	When("receiving a valid lambda response", func() {
 		var lambdaResponse *lambda.Response
@@ -96,25 +105,77 @@ var _ = Describe("Lambda", func() {
 			Expect(httpResponse.Body.String()).To(Equal(lambdaResponse.Body.String()))
 		})
 		It("should add metrics", func() {
-			labelMatcher := HaveKeyWithValue(
-				"functionName=test-function,invocationRole=arn:aws:iam::123456789012:role/test-role",
-				BeNumerically("==", 1),
-			)
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(labelMatcher)
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(invLabels)
 			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(BeEmpty())
-			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(labelMatcher)
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(invLabels)
+		})
+	})
+	When("receiving a lambda response with invalid code", func() {
+		var lambdaResponse *lambda.Response
+		BeforeEach(func() {
+			lambdaResponse = &lambda.Response{
+				StatusCode: 007,
+			}
+			invokerMock.EXPECT().Invoke(gomock.Any(), gomock.Eq(sut.FnRef), lambdaRequest).Return(lambdaResponse, nil)
+			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
+		})
+		It("should respond with InternalServerError", func() {
+			Expect(httpResponse.Code).To(Equal(http.StatusInternalServerError))
+			Expect(httpResponse.Header()).To(BeEmpty())
+			Expect(httpResponse.Body.String()).To(BeEmpty())
+		})
+		It("should add metrics", func() {
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(invLabels)
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(HaveKeyWithValue(
+				"error=lambda returned response with invalid status code '7',functionName=test-function,"+
+					"invocationRole=arn:aws:iam::123456789012:role/test-role",
+				BeNumerically("==", 1),
+			))
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(invLabels)
 		})
 	})
 	When("invoking with timeout", func() {
 		BeforeEach(func() {
 			sut.Timeout = time.Nanosecond
-			<-time.After(sut.Timeout)
+			invokerMock.EXPECT().Invoke(gomock.Any(), gomock.Eq(sut.FnRef), lambdaRequest).DoAndReturn(
+				func(ctx context.Context, ref lambda.FnRef, request *lambda.Request) (*lambda.Response, error) {
+					<-time.After(sut.Timeout)
+					return nil, ctx.Err()
+				})
+			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
+		})
+		It("should respond with GatewayTimeout", func() {
+			Expect(httpResponse.Code).To(Equal(http.StatusGatewayTimeout))
+		})
+		It("should add metrics", func() {
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(invLabels)
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(HaveKeyWithValue(
+				"error=context deadline exceeded,functionName=test-function,"+
+					"invocationRole=arn:aws:iam::123456789012:role/test-role",
+				BeNumerically("==", 1),
+			))
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(invLabels)
+		})
+	})
+	When("context cancelled", func() {
+		BeforeEach(func() {
+			cancel()
 			invokerMock.EXPECT().Invoke(gomock.Any(), gomock.Eq(sut.FnRef), lambdaRequest).DoAndReturn(
 				func(ctx context.Context, ref lambda.FnRef, request *lambda.Request) (*lambda.Response, error) {
 					return nil, ctx.Err()
 				})
 			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
-			Expect(httpResponse.Code).To(Equal(http.StatusGatewayTimeout))
+		})
+		It("should respond with InternalServerError", func() {
+			Expect(httpResponse.Code).To(Equal(http.StatusInternalServerError))
+		})
+		It("should add metrics", func() {
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationTotal)).To(invLabels)
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationErrors)).To(HaveKeyWithValue(
+				"error=context canceled,functionName=test-function,invocationRole=arn:aws:iam::123456789012:role/test-role",
+				BeNumerically("==", 1),
+			))
+			Expect(metrics.Collect(metrics.AwsLambdaInvocationDuration)).To(invLabels)
 		})
 	})
 	When("body cannot be read", func() {

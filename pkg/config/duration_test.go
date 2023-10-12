@@ -32,6 +32,11 @@ var _ = Describe("Duration", func() {
 			Expect(yaml.Unmarshal([]byte(`123s`), sut)).NotTo(HaveOccurred())
 			Expect(sut.Duration).To(Equal(time.Second * 123))
 		})
+		It("should error on invalid yaml", func() {
+			Expect(yaml.Unmarshal([]byte(`blubb: platsch`), sut)).To(MatchError(ContainSubstring(
+				"cannot unmarshal !!map into string",
+			)))
+		})
 		It("should error on invalid duration", func() {
 			Expect(yaml.Unmarshal([]byte(`"hoob"`), sut)).To(MatchError(ContainSubstring("invalid duration")))
 		})

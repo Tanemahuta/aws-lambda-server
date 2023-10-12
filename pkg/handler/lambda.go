@@ -81,13 +81,21 @@ func (r *Lambda) invokeMetered(request *http.Request, event *lambda.Request) (*l
 		}
 	}()
 	ctx := request.Context()
+	ctx = logr.NewContext(ctx, logr.FromContextOrDiscard(request.Context()).WithValues("request", event))
 	if r.Timeout > 0 {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, r.Timeout)
 		defer cancel()
 	}
 	result, err = r.Invoker.Invoke(ctx, r.FnRef, event)
+	if err == nil && r.statusCodeValid(result.StatusCode) {
+		result, err = nil, errors.Errorf("lambda returned response with invalid status code '%v'", result.StatusCode)
+	}
 	return result, err
+}
+
+func (r *Lambda) statusCodeValid(statusCode int) bool {
+	return statusCode < http.StatusContinue || statusCode > http.StatusNetworkAuthenticationRequired
 }
 
 func (r *Lambda) adaptRequest(request *http.Request) (*lambda.Request, error) {

@@ -93,6 +93,18 @@ var _ = Describe("SdkFacade", func() {
 			Expect(sut.Invoke(testcontext.New(), lambda.FnRef{Name: functionName}, request)).
 				To(Equal(response))
 		})
+		It("should convert response error", func() {
+			mockAssumeClients.EXPECT().Get(gomock.Nil()).Return(mockLambda)
+			errMsg := "meh"
+			mockLambda.EXPECT().Invoke(gomock.Any(), gomock.Eq(createInput(functionName, request))).
+				Return(&awslambda.InvokeOutput{LogResult: &errMsg, FunctionError: &errMsg}, nil)
+			_, err := sut.Invoke(testcontext.New(), lambda.FnRef{Name: functionName}, request)
+			Expect(err).To(MatchError(And(
+				ContainSubstring("could not invoke lambda"),
+				ContainSubstring("my-function"),
+				ContainSubstring(errMsg),
+			)))
+		})
 		It("should error if invocation errors", func() {
 			lambdaErr := errors.New("meh")
 			mockAssumeClients.EXPECT().Get(gomock.Nil()).Return(mockLambda)
