@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.21.2
 	github.com/aws/aws-sdk-go-v2/config v1.18.45
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.43
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.39.6
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.40.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.23.2
 	github.com/go-logr/logr v1.2.4
 	github.com/go-logr/zapr v1.2.4
