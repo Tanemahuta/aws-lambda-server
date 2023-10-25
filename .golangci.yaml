@@ -302,6 +302,9 @@ issues:
     - source: "//noinspection"
       linters: [ gocritic ]
     - path: "_test\\.go"
+      source: "\\. \"github\\.com/onsi/.+"
+      linters: [revive]
+    - path: "_test\\.go"
       linters:
         - bodyclose
         - dupl

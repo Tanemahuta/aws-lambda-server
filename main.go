@@ -12,14 +12,14 @@ import (
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/go-logr/logr"
 
-	"github.com/Tanemahuta/aws-lambda-server/pkg/server"
+	"github.com/Tanemahuta/aws-lambda-server/pkg/app"
 	"github.com/go-logr/zapr"
 	"go.uber.org/zap"
 )
 
 func main() {
 	devel := false
-	serverConfig := server.Config{
+	serverConfig := app.Config{
 		Filename:             "/etc/aws-lambda-server/config.yaml",
 		Listen:               ":8080",
 		MetricsListen:        ":8081",
@@ -62,8 +62,8 @@ func main() {
 		"timestamp", buildinfo.Timestamp(),
 	)
 	ctx := logr.NewContext(context.Background(), log)
-	if err = server.Run(ctx, serverConfig); err != nil {
-		log.Error(err, "could not run server")
+	if err = app.Run(ctx, serverConfig); err != nil {
+		log.Error(err, "could not run app")
 		os.Exit(1)
 	}
 }
