@@ -1,4 +1,4 @@
-package server
+package app
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 )
 
-// Config for the server.
+// Config for the app.
 type Config struct {
 	// Filename of the config file.
 	Filename string
@@ -17,7 +17,7 @@ type Config struct {
 	// MetricsListen address for metrics/health checks.
 	MetricsListen string
 	// LambdaServiceFactory to be used.
-	LambdaServiceFactory func(context.Context) (lambda.Facade, error)
-	// RunFunc which runs the server.
+	LambdaServiceFactory func(context.Context, *config.AWS) (lambda.Facade, error)
+	// RunFunc which runs the app.
 	RunFunc func(context.Context, string, http.Handler, *config.HTTP) error
 }

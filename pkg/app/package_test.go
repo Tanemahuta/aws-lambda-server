@@ -1,4 +1,4 @@
-package server_test
+package app_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestServer(t *testing.T) {
+func TestApp(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "server Suite")
+	RunSpecs(t, "app Suite")
 }

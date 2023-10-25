@@ -69,6 +69,20 @@ config:
     writeTimeout: ~
     # Optional: Set a read timeout (e.g. 2m)
     readHeaderTimeout: ~
+  # AWS client configuration, to be propagated to the function
+  aws:
+    # Retry configuration (with defaults from AWS)
+    retry:
+      # Max backoff timeout for a retry
+      maxBackoff: 20s
+      # Max attempts for a request
+      maxAttempts: 3
+      # The cost to deduct from the RateLimiter's token bucket per retry
+      retryCost: 5
+      # The cost to deduct from the RateLimiter's token bucket per retry caused by timeout error.
+      retryTimeoutCost: 10
+      # The cost to payback to the RateLimiter's token bucket for successful attempts.
+      noRetryIncrement: 1
   # Disable validation of the lambda invocation (dry-run) on startup
   disableValidation: false
   functions:

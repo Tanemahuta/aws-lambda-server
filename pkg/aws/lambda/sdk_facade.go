@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/sdk"
+	usercfg "github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/errorx"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -91,7 +92,7 @@ func (s *SdkFacade) handleResponse(response *lambda.InvokeOutput, err error) (*l
 }
 
 // NewLambdaService from aws-sdk.
-func NewLambdaService(ctx context.Context) (Facade, error) {
+func NewLambdaService(ctx context.Context, userCfg *usercfg.AWS) (Facade, error) {
 	var (
 		cfg    aws.Config
 		result Facade
@@ -101,6 +102,9 @@ func NewLambdaService(ctx context.Context) (Facade, error) {
 		func() error {
 			cfg, err = config.LoadDefaultConfig(ctx)
 			return err
+		},
+		func() error {
+			return userCfg.Apply(&cfg)
 		},
 		func() error {
 			result = &SdkFacade{Clients: sdk.NewAssumeClients[sdk.Lambda](sdk.LambdaClientProps(cfg))}

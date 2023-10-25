@@ -1,4 +1,4 @@
-package server_test
+package app_test
 
 import (
 	"bytes"
@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Tanemahuta/aws-lambda-server/pkg/app"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/aws/lambda"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
 	"github.com/Tanemahuta/aws-lambda-server/pkg/metrics"
-	"github.com/Tanemahuta/aws-lambda-server/pkg/server"
 	"github.com/Tanemahuta/aws-lambda-server/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -22,15 +22,15 @@ import (
 var _ = Describe("Run()", func() {
 	var (
 		lambdaServer, metricsServer *httptest.Server
-		serverConfig                server.Config
+		serverConfig                app.Config
 	)
 	BeforeEach(func() {
 		lambdaStubs := testing.DefaultLambdaStubs()
-		serverConfig = server.Config{
+		serverConfig = app.Config{
 			Filename:      "../config/testdata/config.yaml",
 			Listen:        ":8080",
 			MetricsListen: ":8081",
-			LambdaServiceFactory: func(context.Context) (lambda.Facade, error) {
+			LambdaServiceFactory: func(context.Context, *config.AWS) (lambda.Facade, error) {
 				return lambdaStubs, nil
 			},
 			RunFunc: func(ctx context.Context, listenAddr string, handler http.Handler, httpCfg *config.HTTP) error {
@@ -69,13 +69,13 @@ var _ = Describe("Run()", func() {
 		metrics.HTTPRequestsSize.Reset()
 		metrics.HTTPResponsesSize.Reset()
 	})
-	When("running the server", func() {
+	When("running the app", func() {
 		var (
 			response *http.Response
 			err      error
 		)
 		BeforeEach(func() {
-			Expect(server.Run(context.Background(), serverConfig)).NotTo(HaveOccurred())
+			Expect(app.Run(context.Background(), serverConfig)).NotTo(HaveOccurred())
 		})
 		When("handling a valid request", func() {
 			BeforeEach(func() {
@@ -117,12 +117,12 @@ var _ = Describe("Run()", func() {
 	})
 	It("should error from config.Read", func() {
 		serverConfig.Filename += "2"
-		Expect(server.Run(context.Background(), serverConfig)).To(MatchError(ContainSubstring("no such file or directory")))
+		Expect(app.Run(context.Background(), serverConfig)).To(MatchError(ContainSubstring("no such file or directory")))
 	})
 	It("should error from lambda factory", func() {
-		serverConfig.LambdaServiceFactory = func(_ context.Context) (lambda.Facade, error) {
+		serverConfig.LambdaServiceFactory = func(context.Context, *config.AWS) (lambda.Facade, error) {
 			return nil, errors.New("meh")
 		}
-		Expect(server.Run(context.Background(), serverConfig)).To(MatchError(ContainSubstring("meh")))
+		Expect(app.Run(context.Background(), serverConfig)).To(MatchError(ContainSubstring("meh")))
 	})
 })

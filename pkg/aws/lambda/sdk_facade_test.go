@@ -171,7 +171,7 @@ func base64Enc(src []byte) []byte {
 
 var _ = Describe("NewLambdaService()", func() {
 	It("should create service or error", func() {
-		res, err := lambda.NewLambdaService(testcontext.New())
+		res, err := lambda.NewLambdaService(testcontext.New(), nil)
 		Expect([]interface{}{res, err}).To(Or(
 			ConsistOf(Not(BeNil()), Not(HaveOccurred())),
 			ConsistOf(BeNil(), HaveOccurred()),

@@ -1,4 +1,4 @@
-package server
+package app
 
 import (
 	"context"
@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Run(ctx context.Context, serverConfig Config) error {
+func Run(ctx context.Context, appConfig Config) error {
 	log := logr.FromContextOrDiscard(ctx)
 	var (
 		routerConfig  *config.Server
@@ -26,29 +26,29 @@ func Run(ctx context.Context, serverConfig Config) error {
 	)
 	return errorx.Fns{
 		func() error {
-			log.Info("reading config file", "filename", serverConfig.Filename)
-			routerConfig, err = config.Read(ctx, serverConfig.Filename)
-			return errors.Wrapf(err, "could not read routerConfig '%v'", serverConfig.Filename)
+			log.Info("reading config file", "filename", appConfig.Filename)
+			routerConfig, err = config.Read(ctx, appConfig.Filename)
+			return errors.Wrapf(err, "could not read routerConfig '%v'", appConfig.Filename)
 		},
 		func() error {
-			log.Info("validating config", "filename", serverConfig.Filename)
+			log.Info("validating config", "filename", appConfig.Filename)
 			return config.Validate(routerConfig)
 		},
 		func() error {
 			log.Info("creating lambda service")
-			lambdaService, err = serverConfig.LambdaServiceFactory(ctx)
-			return errors.Wrapf(err, "could not create lambda service '%v'", serverConfig.Filename)
+			lambdaService, err = appConfig.LambdaServiceFactory(ctx, routerConfig.AWS)
+			return errors.Wrapf(err, "could not create lambda service '%v'", appConfig.Filename)
 		},
 		func() error {
-			log.Info("creating server router")
+			log.Info("creating app router")
 			requestRouter, err = routing.New(lambdaService, routerConfig, routing.MetricsDecorators...)
-			return errors.Wrapf(err, "could not create server router '%v'", serverConfig.Filename)
+			return errors.Wrapf(err, "could not create app router '%v'", appConfig.Filename)
 		},
 		func() error {
 			group, runCtx := errgroup.WithContext(ctx)
 			group.Go(func() error {
 				log.Info("handling requests")
-				return serverConfig.RunFunc(runCtx, serverConfig.Listen, requestRouter, &routerConfig.HTTP)
+				return appConfig.RunFunc(runCtx, appConfig.Listen, requestRouter, &routerConfig.HTTP)
 			})
 			group.Go(func() error {
 				log.Info("handling metrics")
@@ -56,7 +56,7 @@ func Run(ctx context.Context, serverConfig Config) error {
 				metricsRouter.NewRoute().Methods(http.MethodGet).Path("/metrics").Handler(promhttp.Handler())
 				metricsRouter.NewRoute().Methods(http.MethodGet).Path("/healthz").HandlerFunc(ping)
 				metricsRouter.NewRoute().Methods(http.MethodGet).Path("/readyz").HandlerFunc(ping)
-				return serverConfig.RunFunc(runCtx, serverConfig.MetricsListen, metricsRouter, &routerConfig.HTTP)
+				return appConfig.RunFunc(runCtx, appConfig.MetricsListen, metricsRouter, &routerConfig.HTTP)
 			})
 			return group.Wait()
 		},
