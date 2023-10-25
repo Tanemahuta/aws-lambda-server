@@ -69,6 +69,7 @@ config:
     writeTimeout: ~
     # Optional: Set a read timeout (e.g. 2m)
     readHeaderTimeout: ~
+  # TODO aws config
   # Disable validation of the lambda invocation (dry-run) on startup
   disableValidation: false
   functions:

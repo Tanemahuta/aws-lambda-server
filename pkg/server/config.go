@@ -17,7 +17,7 @@ type Config struct {
 	// MetricsListen address for metrics/health checks.
 	MetricsListen string
 	// LambdaServiceFactory to be used.
-	LambdaServiceFactory func(context.Context) (lambda.Facade, error)
+	LambdaServiceFactory func(context.Context, *config.AWS) (lambda.Facade, error)
 	// RunFunc which runs the server.
 	RunFunc func(context.Context, string, http.Handler, *config.HTTP) error
 }

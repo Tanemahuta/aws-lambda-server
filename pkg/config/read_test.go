@@ -20,6 +20,15 @@ var _ = Describe("Read()", func() {
 				WriteTimeout:      config.Duration{Duration: time.Minute * 3},
 				EnableTraceparent: true,
 			},
+			AWS: &config.AWS{
+				Retry: &config.AWSRetry{
+					MaxBackoff:       config.Duration{Duration: 20 * time.Second},
+					MaxAttempts:      3,
+					RetryCost:        5,
+					RetryTimeoutCost: 10,
+					NoRetryIncrement: 1,
+				},
+			},
 			DisableValidation: true,
 			Functions: []config.Function{
 				{

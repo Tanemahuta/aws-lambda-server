@@ -30,7 +30,7 @@ var _ = Describe("Run()", func() {
 			Filename:      "../config/testdata/config.yaml",
 			Listen:        ":8080",
 			MetricsListen: ":8081",
-			LambdaServiceFactory: func(context.Context) (lambda.Facade, error) {
+			LambdaServiceFactory: func(context.Context, *config.AWS) (lambda.Facade, error) {
 				return lambdaStubs, nil
 			},
 			RunFunc: func(ctx context.Context, listenAddr string, handler http.Handler, httpCfg *config.HTTP) error {
@@ -120,7 +120,7 @@ var _ = Describe("Run()", func() {
 		Expect(server.Run(context.Background(), serverConfig)).To(MatchError(ContainSubstring("no such file or directory")))
 	})
 	It("should error from lambda factory", func() {
-		serverConfig.LambdaServiceFactory = func(_ context.Context) (lambda.Facade, error) {
+		serverConfig.LambdaServiceFactory = func(context.Context, *config.AWS) (lambda.Facade, error) {
 			return nil, errors.New("meh")
 		}
 		Expect(server.Run(context.Background(), serverConfig)).To(MatchError(ContainSubstring("meh")))

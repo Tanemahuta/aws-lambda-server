@@ -1,7 +1,10 @@
 package config_test
 
 import (
+	"path"
+
 	"github.com/Tanemahuta/aws-lambda-server/pkg/config"
+	"github.com/Tanemahuta/aws-lambda-server/testing/testcontext"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -29,6 +32,11 @@ var _ = Describe("Validate()", func() {
 					{ARN: &validArn, Routes: []config.Route{{PathPrefix: "/"}}},
 				},
 			})).NotTo(HaveOccurred())
+		})
+		It("should validate example config", func() {
+			cfg, err := config.Read(testcontext.New(), path.Join("testdata", "config.yaml"))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(config.Validate(cfg)).NotTo(HaveOccurred())
 		})
 		It("should error if functions are empty", func() {
 			Expect(config.Validate(&config.Server{})).To(MatchError(ContainSubstring("Functions")))
