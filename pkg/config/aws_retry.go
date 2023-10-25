@@ -45,7 +45,7 @@ func (r *AWSRetry) Apply(cfg *aws.Config) error {
 			)
 		}
 		optsFuncs = append(optsFuncs, func(options *retry.StandardOptions) {
-			reflect.ValueOf(options).FieldByName(tgtFld.Name).Set(srcFldVal)
+			reflect.ValueOf(options).Elem().FieldByName(tgtFld.Name).Set(srcFldVal)
 		})
 	}
 	if len(optsFuncs) > 0 {

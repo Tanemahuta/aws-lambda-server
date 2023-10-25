@@ -34,6 +34,7 @@ var _ = Describe("AWS", func() {
 			sut = exampleCfg.AWS
 			Expect(sut.Apply(tgt)).NotTo(HaveOccurred())
 			Expect(tgt.Retryer).NotTo(BeNil())
+			Expect(tgt.Retryer()).NotTo(BeNil())
 		})
 	})
 })
