@@ -41,4 +41,16 @@ var _ = Describe("Duration", func() {
 			Expect(yaml.Unmarshal([]byte(`"hoob"`), sut)).To(MatchError(ContainSubstring("invalid duration")))
 		})
 	})
+	Context("MarshalJSON()", func() {
+		It("should marshal correctly", func() {
+			sut.Duration = 3 * time.Minute
+			Expect(json.Marshal(sut)).To(Equal(([]byte)(`"3m0s"`)))
+		})
+	})
+	Context("MarshalYAML()", func() {
+		It("should marshal correctly", func() {
+			sut.Duration = 3 * time.Minute
+			Expect(yaml.Marshal(sut)).To(Equal(([]byte)("3m0s\n")))
+		})
+	})
 })

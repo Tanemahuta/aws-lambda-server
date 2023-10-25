@@ -8,7 +8,9 @@ import (
 )
 
 var _ json.Unmarshaler = &Duration{}
+var _ json.Marshaler = &Duration{}
 var _ yaml.Unmarshaler = &Duration{}
+var _ yaml.Marshaler = &Duration{}
 
 var _ Wrapped = Duration{}
 
@@ -43,4 +45,12 @@ func (d *Duration) parse(str string) error {
 	}
 	*d = Duration{Duration: decorated}
 	return nil
+}
+
+func (d *Duration) MarshalYAML() (interface{}, error) {
+	return d.String(), nil
+}
+
+func (d *Duration) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.String())
 }
