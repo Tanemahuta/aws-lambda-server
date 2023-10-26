@@ -27,6 +27,7 @@ var _ = Describe("Read()", func() {
 					RetryCost:        5,
 					RetryTimeoutCost: 10,
 					NoRetryIncrement: 1,
+					RateLimiter:      config.AWSRetryRateLimiter{Tokens: 500},
 				},
 			},
 			DisableValidation: true,

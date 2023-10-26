@@ -4,9 +4,25 @@ import (
 	"reflect"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
 	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/pkg/errors"
 )
+
+var _ Wrapped = &AWSRetryRateLimiter{}
+
+// AWSRetryRateLimiter config.
+type AWSRetryRateLimiter struct {
+	// Tokens to be obtained.
+	Tokens uint `json:"tokens,omitempty" yaml:"tokens,omitempty" validate:"omitempty"`
+}
+
+func (a AWSRetryRateLimiter) Unwrap() interface{} {
+	if a.Tokens == 0 {
+		return ratelimit.NewTokenRateLimit(retry.DefaultRetryRateTokens)
+	}
+	return ratelimit.NewTokenRateLimit(a.Tokens)
+}
 
 // AWSRetry configuration.
 type AWSRetry struct {
@@ -20,6 +36,8 @@ type AWSRetry struct {
 	RetryTimeoutCost uint `json:"retryTimeoutCost,omitempty" yaml:"retryTimeoutCost,omitempty" validate:"omitempty"`
 	// The cost to payback to the RateLimiter's token bucket for successful attempts.
 	NoRetryIncrement uint `json:"noRetryIncrement,omitempty" yaml:"noRetryIncrement,omitempty" validate:"omitempty"`
+	// RateLimiter configuration.
+	RateLimiter AWSRetryRateLimiter `json:"rateLimiter,omitempty" yaml:"rateLimiter,omitempty" validate:"omitempty"`
 }
 
 func (r *AWSRetry) Apply(cfg *aws.Config) error {
@@ -44,9 +62,12 @@ func (r *AWSRetry) Apply(cfg *aws.Config) error {
 				"field '%v' type '%v' not assignable to type '%v", srcFld.Name, srcFldVal.Type(), tgtFld.Type,
 			)
 		}
-		optsFuncs = append(optsFuncs, func(options *retry.StandardOptions) {
-			reflect.ValueOf(options).Elem().FieldByName(tgtFld.Name).Set(srcFldVal)
-		})
+		// Do not use zero values.
+		if !srcFldVal.IsZero() {
+			optsFuncs = append(optsFuncs, func(options *retry.StandardOptions) {
+				reflect.ValueOf(options).Elem().FieldByName(tgtFld.Name).Set(srcFldVal)
+			})
+		}
 	}
 	if len(optsFuncs) > 0 {
 		cfg.Retryer = func() aws.Retryer { return retry.NewStandard(optsFuncs...) }

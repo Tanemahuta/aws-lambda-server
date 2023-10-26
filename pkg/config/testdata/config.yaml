@@ -24,6 +24,10 @@ aws:
     retryTimeoutCost: 10
     # The cost to payback to the RateLimiter's token bucket for successful attempts.
     noRetryIncrement: 1
+    # Rate limiter options
+    rateLimiter:
+      # Amount of tokens
+      tokens: 500
 # Functions to be mapped
 functions:
   # Multiple functions can be added here
