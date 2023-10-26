@@ -22,12 +22,14 @@ var _ = Describe("Read()", func() {
 			},
 			AWS: &config.AWS{
 				Retry: &config.AWSRetry{
-					MaxBackoff:       config.Duration{Duration: 20 * time.Second},
-					MaxAttempts:      3,
-					RetryCost:        5,
-					RetryTimeoutCost: 10,
-					NoRetryIncrement: 1,
-					RateLimiter:      config.AWSRetryRateLimiter{Tokens: 500},
+					MaxBackoff:  config.Duration{Duration: 11 * time.Second},
+					MaxAttempts: 11,
+					RateLimiter: config.AWSRetryRateLimiter{
+						RetryCost:        11,
+						RetryTimeoutCost: 11,
+						NoRetryIncrement: 11,
+						Tokens:           111,
+					},
 				},
 			},
 			DisableValidation: true,

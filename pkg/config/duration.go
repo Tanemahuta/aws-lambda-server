@@ -12,14 +12,8 @@ var _ json.Marshaler = &Duration{}
 var _ yaml.Unmarshaler = &Duration{}
 var _ yaml.Marshaler = &Duration{}
 
-var _ Wrapped = Duration{}
-
 type Duration struct {
 	time.Duration
-}
-
-func (d Duration) Unwrap() interface{} {
-	return d.Duration
 }
 
 func (d *Duration) UnmarshalYAML(value *yaml.Node) error {

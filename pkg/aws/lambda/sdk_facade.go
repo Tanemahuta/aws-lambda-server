@@ -104,9 +104,7 @@ func NewLambdaService(ctx context.Context, userCfg *usercfg.AWS) (Facade, error)
 			return err
 		},
 		func() error {
-			return userCfg.Apply(&cfg)
-		},
-		func() error {
+			userCfg.Apply(&cfg)
 			result = &SdkFacade{Clients: sdk.NewAssumeClients[sdk.Lambda](sdk.LambdaClientProps(cfg))}
 			return nil
 		},

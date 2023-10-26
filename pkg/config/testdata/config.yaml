@@ -12,22 +12,22 @@ http:
   writeTimeout: 3m
 # AWS client configuration, to be propagated to the function
 aws:
-  # Retry configuration (with defaults from AWS)
+  # Retry configuration (overrides AWS defaults)
   retry:
     # Max backoff timeout for a retry
-    maxBackoff: 20s
+    maxBackoff: 11s
     # Max attempts for a request
-    maxAttempts: 3
-    # The cost to deduct from the RateLimiter's token bucket per retry
-    retryCost: 5
-    # The cost to deduct from the RateLimiter's token bucket per retry caused by timeout error.
-    retryTimeoutCost: 10
-    # The cost to payback to the RateLimiter's token bucket for successful attempts.
-    noRetryIncrement: 1
+    maxAttempts: 11
     # Rate limiter options
     rateLimiter:
+      # The cost to deduct from the token bucket per retry
+      retryCost: 11
+      # The cost to deduct from the token bucket per retry caused by timeout error.
+      retryTimeoutCost: 11
+      # The cost to payback to the token bucket for successful attempts.
+      noRetryIncrement: 11
       # Amount of tokens
-      tokens: 500
+      tokens: 111
 # Functions to be mapped
 functions:
   # Multiple functions can be added here

@@ -8,9 +8,9 @@ type AWS struct {
 	Retry *AWSRetry `json:"retry,omitempty" yaml:"retry,omitempty" validate:"omitempty"`
 }
 
-func (a *AWS) Apply(cfg *aws.Config) error {
+func (a *AWS) Apply(cfg *aws.Config) {
 	if a == nil {
-		return nil
+		return
 	}
-	return a.Retry.Apply(cfg)
+	a.Retry.Apply(cfg)
 }
