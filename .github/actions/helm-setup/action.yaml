@@ -15,4 +15,4 @@ runs:
         check-latest: true
     # Setup helm chart-testing itself
     - name: Set up chart-testing
-      uses: helm/chart-testing-action@v2.4.0
+      uses: helm/chart-testing-action@v2.6.1
