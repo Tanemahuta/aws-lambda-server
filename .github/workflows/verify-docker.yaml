@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     # Build docker image
     steps:
+      - name: image-name
+        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
       # Checkout
       - name: checkout
         uses: actions/checkout@v3
@@ -26,6 +28,6 @@ jobs:
       - uses: ./.github/actions/docker-setup
       - uses: ./.github/actions/docker-build
         with:
-          tags: aws-lambda-server:${{ github.sha }}
+          tags: ${{env.IMAGE_NAME}}:${{ github.sha }}
           push: false
           load: false

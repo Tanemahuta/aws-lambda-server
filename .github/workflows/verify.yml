@@ -4,7 +4,16 @@ on:
     branches: ["main"]
   workflow_call:
     inputs: {}
+  workflow_dispatch:
+    inputs: {}
 jobs:
+  fullbuild:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: run
+        run: ""
   changes:
     runs-on: ubuntu-latest
     outputs:
@@ -43,14 +52,20 @@ jobs:
               - '.github/actions/docker-*/*.yaml'
               - '.github/workflows/*-docker.yaml'
   golang:
-    needs: changes
+    needs:
+      - changes
+      - fullbuild
     uses: ./.github/workflows/verify-go.yaml
-    if: needs.changes.outputs.golang == 'true' || startsWith(github.ref, 'refs/tags/')
+    if: needs.changes.outputs.golang == 'true' || needs.fullbuild.outputs.run
   docker:
-    needs: changes
+    needs:
+      - changes
+      - fullbuild
     uses: ./.github/workflows/verify-docker.yaml
-    if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.docker == 'true' || startsWith(github.ref, 'refs/tags/')
+    if: needs.changes.outputs.golang == 'true' || needs.changes.outputs.docker == 'true' || needs.fullbuild.outputs.run
   helm:
-    needs: changes
+    needs:
+      - changes
+      - fullbuild
     uses: ./.github/workflows/verify-helm.yaml
-    if: needs.changes.outputs.helm == 'true' || startsWith(github.ref, 'refs/tags/')
+    if: needs.changes.outputs.helm == 'true' || startsWith(github.ref, 'refs/tags/') || needs.fullbuild.outputs.run
