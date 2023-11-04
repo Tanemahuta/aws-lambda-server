@@ -28,14 +28,20 @@ jobs:
               - 'go.mod'
               - 'go.sum'
               - '.golangci.yaml'
+              - '.github/actions/go-*/*.yaml'
+              - '.github/workflows/*-go.yaml'
             helm:
               - 'charts/**'
               - '.yamllint'
+              - '.github/actions/helm-*/*.yaml'
+              - '.github/workflows/*-helm.yaml'
             docker:
               - 'Dockerfile'
               - '.dockerignore'
               - '.hadolint.yaml'
               - 'buildinfo/*.sh'
+              - '.github/actions/docker-*/*.yaml'
+              - '.github/workflows/*-docker.yaml'
   golang:
     needs: changes
     uses: ./.github/workflows/verify-go.yaml
