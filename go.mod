@@ -13,7 +13,7 @@ require (
 	github.com/go-playground/validator/v10 v10.15.5
 	github.com/golang/mock v1.6.0
 	github.com/gonvenience/ytbx v1.4.4
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/homeport/dyff v1.6.0
 	github.com/onsi/ginkgo/v2 v2.13.0
 	github.com/onsi/gomega v1.29.0
