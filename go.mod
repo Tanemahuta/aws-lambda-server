@@ -3,10 +3,10 @@ module github.com/Tanemahuta/aws-lambda-server
 go 1.21
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.23.1
+	github.com/aws/aws-sdk-go-v2 v1.23.2
 	github.com/aws/aws-sdk-go-v2/config v1.25.5
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.5
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.48.1
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.48.3
 	github.com/aws/aws-sdk-go-v2/service/sts v1.25.5
 	github.com/go-logr/logr v1.3.0
 	github.com/go-logr/zapr v1.3.0
@@ -32,8 +32,8 @@ require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.5.1 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.14.5 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.4 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.5.4 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.5 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.5.5 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.7.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.10.4 // indirect
