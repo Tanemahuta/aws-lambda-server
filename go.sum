@@ -67,8 +67,8 @@ github.com/golang/protobuf v1.5.3 h1:KhyjKVUg7Usr/dYsdSqoFveMYd5ko72D+zANwlG1mmg
 github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
 github.com/gonvenience/bunt v1.3.5 h1:wSQquifvwEWtzn27k1ngLfeLaStyt0k1b/K6TrlCNAs=
 github.com/gonvenience/bunt v1.3.5/go.mod h1:7ApqkVBEWvX04oJ28Q2WeI/BvJM6VtukaJAU/q/pTs8=
-github.com/gonvenience/neat v1.3.12 h1:xwIyRbJcG9LgcDYys+HHLH9DqqHeQsUpS5CfBUeskbs=
-github.com/gonvenience/neat v1.3.12/go.mod h1:8OljAIgPelN0uPPO94VBqxK+Kz98d6ZFwHDg5o/PfkE=
+github.com/gonvenience/neat v1.3.13 h1:wRp1k0GX5EOpelNH3GyLaFy4SvnJ6k1U5SenmEWkXko=
+github.com/gonvenience/neat v1.3.13/go.mod h1:aE3+z4XlTJ+RzlZxdFiAIIJc1ikYLALAWtX9LqjQ87Q=
 github.com/gonvenience/term v1.0.2 h1:qKa2RydbWIrabGjR/fegJwpW5m+JvUwFL8mLhHzDXn0=
 github.com/gonvenience/term v1.0.2/go.mod h1:wThTR+3MzWtWn7XGVW6qQ65uaVf8GHED98KmwpuEQeo=
 github.com/gonvenience/text v1.0.7 h1:YmIqmgTwxnACYCG59DykgMbomwteYyNhAmEUEJtPl14=
@@ -84,8 +84,8 @@ github.com/google/pprof v0.0.0-20230926050212-f7f687d19a98 h1:pUa4ghanp6q4IJHwE9
 github.com/google/pprof v0.0.0-20230926050212-f7f687d19a98/go.mod h1:czg5+yv1E0ZGTi6S6vVK1mke0fV+FaUhNGcd6VRS9Ik=
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
-github.com/homeport/dyff v1.7.0 h1:u/dwWwDqgeVbRzDKwD9R9mC69Is9llm8m3/ZH3jQmMM=
-github.com/homeport/dyff v1.7.0/go.mod h1:w4iTZJkZ8k16GcF+sdSvarVyb3fYxCoL5r/WtaUkj2s=
+github.com/homeport/dyff v1.7.1 h1:B3KJUtnU53H2UryxGcfYKQPrde8VjjbwlHZbczH3giQ=
+github.com/homeport/dyff v1.7.1/go.mod h1:iLe5b3ymc9xmHZNuJlNVKERE8L2isQMBLxFiTXcwZY0=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1 h1:shLQSRRSCCPj3f2gpwzGwWFoC7ycTf1rcQZHOlsJ6N8=
