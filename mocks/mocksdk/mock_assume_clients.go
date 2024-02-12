@@ -13,38 +13,38 @@ import (
 )
 
 // MockAssumeClients is a mock of AssumeClients interface.
-type MockAssumeClients struct {
+type MockAssumeClients[C sdk.Client] struct {
 	ctrl     *gomock.Controller
-	recorder *MockAssumeClientsMockRecorder
+	recorder *MockAssumeClientsMockRecorder[C]
 }
 
 // MockAssumeClientsMockRecorder is the mock recorder for MockAssumeClients.
-type MockAssumeClientsMockRecorder struct {
-	mock *MockAssumeClients
+type MockAssumeClientsMockRecorder[C sdk.Client] struct {
+	mock *MockAssumeClients[C]
 }
 
 // NewMockAssumeClients creates a new mock instance.
-func NewMockAssumeClients(ctrl *gomock.Controller) *MockAssumeClients {
-	mock := &MockAssumeClients{ctrl: ctrl}
-	mock.recorder = &MockAssumeClientsMockRecorder{mock}
+func NewMockAssumeClients[C sdk.Client](ctrl *gomock.Controller) *MockAssumeClients[C] {
+	mock := &MockAssumeClients[C]{ctrl: ctrl}
+	mock.recorder = &MockAssumeClientsMockRecorder[C]{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAssumeClients) EXPECT() *MockAssumeClientsMockRecorder {
+func (m *MockAssumeClients[C]) EXPECT() *MockAssumeClientsMockRecorder[C] {
 	return m.recorder
 }
 
 // Get mocks base method.
-func (m *MockAssumeClients) Get(assumeRole *arn.ARN) sdk.C {
+func (m *MockAssumeClients[C]) Get(assumeRole *arn.ARN) C {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", assumeRole)
-	ret0, _ := ret[0].(sdk.C)
+	ret0, _ := ret[0].(C)
 	return ret0
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockAssumeClientsMockRecorder) Get(assumeRole interface{}) *gomock.Call {
+func (mr *MockAssumeClientsMockRecorder[C]) Get(assumeRole interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockAssumeClients)(nil).Get), assumeRole)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockAssumeClients[C])(nil).Get), assumeRole)
 }
