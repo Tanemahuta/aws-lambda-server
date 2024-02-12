@@ -20,8 +20,8 @@ var _ = Describe("CurryMeteringFactory()", func() {
 			[]string{metrics.FunctionNameLabel, metrics.InvocationRoleArnLabel},
 		)
 		factory := routing.CurryMeteringFactory[*prometheus.CounterVec](
-			func(o *prometheus.CounterVec, _ http.Handler, option ...promhttp.Option) http.HandlerFunc {
-				return func(writer http.ResponseWriter, request *http.Request) {
+			func(o *prometheus.CounterVec, _ http.Handler, _ ...promhttp.Option) http.HandlerFunc {
+				return func(_ http.ResponseWriter, _ *http.Request) {
 					o.With(prometheus.Labels{}).Inc()
 				}
 			},

@@ -33,7 +33,7 @@ var _ = Describe("Run()", func() {
 			LambdaServiceFactory: func(context.Context, *config.AWS) (lambda.Facade, error) {
 				return lambdaStubs, nil
 			},
-			RunFunc: func(ctx context.Context, listenAddr string, handler http.Handler, httpCfg *config.HTTP) error {
+			RunFunc: func(_ context.Context, listenAddr string, handler http.Handler, httpCfg *config.HTTP) error {
 				defer GinkgoRecover()
 				Expect(httpCfg).To(Equal(&config.HTTP{
 					ReadHeaderTimeout: config.Duration{Duration: time.Minute * 1},

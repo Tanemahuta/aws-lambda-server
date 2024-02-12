@@ -138,7 +138,7 @@ var _ = Describe("Lambda", func() {
 		BeforeEach(func() {
 			sut.Timeout = time.Nanosecond
 			invokerMock.EXPECT().Invoke(gomock.Any(), gomock.Eq(sut.FnRef), lambdaRequest).DoAndReturn(
-				func(ctx context.Context, ref lambda.FnRef, request *lambda.Request) (*lambda.Response, error) {
+				func(ctx context.Context, _ lambda.FnRef, _ *lambda.Request) (*lambda.Response, error) {
 					<-time.After(sut.Timeout)
 					return nil, ctx.Err()
 				})
@@ -161,7 +161,7 @@ var _ = Describe("Lambda", func() {
 		BeforeEach(func() {
 			cancel()
 			invokerMock.EXPECT().Invoke(gomock.Any(), gomock.Eq(sut.FnRef), lambdaRequest).DoAndReturn(
-				func(ctx context.Context, ref lambda.FnRef, request *lambda.Request) (*lambda.Response, error) {
+				func(ctx context.Context, _ lambda.FnRef, _ *lambda.Request) (*lambda.Response, error) {
 					return nil, ctx.Err()
 				})
 			Expect(func() { sut.ServeHTTP(httpResponse, httpRequest) }).NotTo(Panic())
