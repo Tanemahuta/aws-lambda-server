@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.37
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.35
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.60.0
-	github.com/aws/aws-sdk-go-v2/service/sts v1.31.1
+	github.com/aws/aws-sdk-go-v2/service/sts v1.31.2
 	github.com/go-logr/logr v1.4.2
 	github.com/go-logr/zapr v1.3.0
 	github.com/go-playground/validator/v10 v10.22.1
