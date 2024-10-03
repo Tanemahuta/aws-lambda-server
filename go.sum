@@ -80,8 +80,8 @@ github.com/google/pprof v0.0.0-20240827171923-fa2c70bbbfe5 h1:5iH8iuqE5apketRbSF
 github.com/google/pprof v0.0.0-20240827171923-fa2c70bbbfe5/go.mod h1:vavhavw2zAxS5dIdcRluK6cSGGPlZynqzFM8NdvU144=
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
-github.com/homeport/dyff v1.9.1 h1:X9zrcfsYn+kDVrzwcs6arSxDg6wXkzersHHU9stsUOA=
-github.com/homeport/dyff v1.9.1/go.mod h1:smCju/EnwXnfxdeN//7Dt7/Z36I11NbTPNZNADRn1+A=
+github.com/homeport/dyff v1.9.2 h1:BxAjdpF9XziYOK8LM1vvRPNsXflseHBXKQEGA7eAby8=
+github.com/homeport/dyff v1.9.2/go.mod h1:smCju/EnwXnfxdeN//7Dt7/Z36I11NbTPNZNADRn1+A=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1 h1:shLQSRRSCCPj3f2gpwzGwWFoC7ycTf1rcQZHOlsJ6N8=
