@@ -1,7 +1,7 @@
 module github.com/Tanemahuta/aws-lambda-server
 
 go 1.21
-toolchain go1.22.5
+toolchain go1.23.7
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.36.3
@@ -25,7 +25,7 @@ require (
 	go.opentelemetry.io/otel v1.34.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
-	golang.org/x/sync v0.11.0
+	golang.org/x/sync v0.12.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
