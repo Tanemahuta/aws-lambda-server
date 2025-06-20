@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.5
 	github.com/aws/aws-sdk-go-v2/config v1.29.16
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.70
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.71.3
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.72.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.34.0
 	github.com/go-logr/logr v1.4.3
 	github.com/go-logr/zapr v1.3.0
@@ -32,7 +32,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.10 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.11 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.32 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.36 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.36 // indirect
