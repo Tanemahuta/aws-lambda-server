@@ -24,7 +24,7 @@ require (
 	github.com/prometheus/client_model v0.6.2
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0
 	go.opentelemetry.io/otel v1.38.0
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/sync v0.18.0
 	gopkg.in/yaml.v3 v3.0.1
