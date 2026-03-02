@@ -1,6 +1,6 @@
 module github.com/Tanemahuta/aws-lambda-server
 
-go 1.24.9
+go 1.25.0
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.2
@@ -14,7 +14,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/gonvenience/ytbx v1.4.8
 	github.com/gorilla/mux v1.8.1
-	github.com/homeport/dyff v1.10.5
+	github.com/homeport/dyff v1.11.2
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
 	github.com/pkg/errors v0.9.1
@@ -52,7 +52,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/gonvenience/bunt v1.4.3 // indirect
 	github.com/gonvenience/idem v0.0.3 // indirect
-	github.com/gonvenience/neat v1.3.17 // indirect
+	github.com/gonvenience/neat v1.3.18 // indirect
 	github.com/gonvenience/term v1.0.5 // indirect
 	github.com/gonvenience/text v1.0.10 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -77,7 +77,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/mod v0.33.0 // indirect
-	golang.org/x/net v0.50.0 // indirect
+	golang.org/x/net v0.51.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/term v0.40.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
