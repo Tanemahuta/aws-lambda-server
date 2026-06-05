@@ -3,7 +3,7 @@ module github.com/Tanemahuta/aws-lambda-server
 go 1.25.0
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.41.11
+	github.com/aws/aws-sdk-go-v2 v1.41.12
 	github.com/aws/aws-sdk-go-v2/config v1.32.18
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.19
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.91.0
@@ -41,7 +41,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/signin v1.1.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.30.19 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.36.2 // indirect
-	github.com/aws/smithy-go v1.27.0 // indirect
+	github.com/aws/smithy-go v1.27.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
