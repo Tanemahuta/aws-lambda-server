@@ -3,7 +3,7 @@ module github.com/Tanemahuta/aws-lambda-server
 go 1.25.0
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.43.1
+	github.com/aws/aws-sdk-go-v2 v1.43.2
 	github.com/aws/aws-sdk-go-v2/config v1.32.31
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.31
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.100.0
