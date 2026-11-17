@@ -22,8 +22,8 @@ github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.24 h1:jGzHjc
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.24/go.mod h1:uJt75pK2cEyY80F5C+DK9YkCkJWsMkJViHxLYZRHl8Y=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.11 h1:PO7Tx443ecMI00nIxDrT99DVcbeMBQ6BUtJlDMRnY24=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.11/go.mod h1:n/9RixikO12YvNomZLP8k4TgUSoEkT1W23QIrpFAPvw=
-github.com/aws/aws-sdk-go-v2/service/lambda v1.114.4 h1:m9KfA2ojf6w77HjOrl8kpiNHAHz+sar1M0yDzEIxMEo=
-github.com/aws/aws-sdk-go-v2/service/lambda v1.114.4/go.mod h1:Y/PfQ6QmryXcdj5kOOCMUYFYCiDvwuYpjCJJE76DEKs=
+github.com/aws/aws-sdk-go-v2/service/lambda v1.115.0 h1:JKklfzikgy4WUW1FGLNkLZDQsK8J23svLDzDmLOz9WI=
+github.com/aws/aws-sdk-go-v2/service/lambda v1.115.0/go.mod h1:Y/PfQ6QmryXcdj5kOOCMUYFYCiDvwuYpjCJJE76DEKs=
 github.com/aws/aws-sdk-go-v2/service/signin v1.13.0 h1:1cHBtZSsEEvghtDyjtRoYZ4GdjJy9Sh45GglOWEEm5Q=
 github.com/aws/aws-sdk-go-v2/service/signin v1.13.0/go.mod h1:PCRJucC12nFWle7wRGhSj0cw3OKB84M0EBwTrv34dhg=
 github.com/aws/aws-sdk-go-v2/service/sso v1.39.4 h1:qQ97XqrlFGRRhhrcDbeqUVeezamo1a1F7lH4HczU7EA=
